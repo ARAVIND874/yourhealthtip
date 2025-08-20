@@ -10,6 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         .animate-pulse-slow {
             animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -22,22 +23,49 @@
                 opacity: .5;
             }
         }
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .feature-card {
+            min-width: 120px;
+        }
+        .voice-button.listening {
+            animation: pulse-slow 1.5s infinite;
+        }
+        .voice-button.speaking {
+            animation: pulse-slow 1.5s infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
 
-    <div id="app" class="flex flex-col items-center p-8">
+    <div id="app" class="flex flex-col items-center p-4 sm:p-8">
         <!-- App content will be rendered here by JavaScript -->
     </div>
 
-    <!-- Custom Modal -->
-    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center hidden">
-        <div class="relative p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-sm w-full mx-4 sm:mx-auto">
+    <!-- Language Switcher Modal -->
+    <div id="lang-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center hidden">
+        <div class="relative p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg w-11/12 max-w-sm mx-4">
+            <h3 class="text-xl font-bold mb-4 text-center">{{t.selectLanguage}}</h3>
+            <div class="flex justify-center space-x-4">
+                <button onclick="switchLanguage('ta'); closeModal('lang-modal');" class="p-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors w-1/2">
+                    தமிழ்
+                </button>
+                <button onclick="switchLanguage('en'); closeModal('lang-modal');" class="p-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors w-1/2">
+                    English
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Modal for Alerts -->
+    <div id="alert-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center hidden">
+        <div class="relative p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg w-11/12 max-w-sm mx-4">
             <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
             <p id="modal-message" class="text-gray-700 dark:text-gray-300"></p>
             <div class="mt-6 text-right">
-                <button onclick="closeModal()" class="p-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                    சரி
+                <button onclick="closeModal('alert-modal')" class="p-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    {{t.alarmModalDismissBtn}}
                 </button>
             </div>
         </div>
@@ -128,10 +156,36 @@
                 journalEntriesOutputDefault: 'உங்கள் நாட்குறிப்பு பதிவுகள் இங்கே தோன்றும்.',
                 analyzeMoodJournalBtn: 'மனநிலையை பகுப்பாய்வு செய்',
                 moodAnalysisOutputDefault: 'உங்கள் மனநிலை பகுப்பாய்வு இங்கே தோன்றும்.',
-
-                // General page
-                generalPageDefault: 'இந்த அம்சம் இன்னும் உருவாக்கப்படவில்லை. எதிர்காலத்தில் சேர்க்கப்படும்!',
-
+                
+                // Medication Reminder
+                medicationTitle: 'மருந்து நினைவூட்டல்',
+                medicineNamePlaceholder: 'மருந்தின் பெயர்',
+                dosagePlaceholder: 'அளவு (எ.கா: 1 மாத்திரை)',
+                timePlaceholder: 'நேரம் (HH:MM)',
+                addMedicationBtn: 'மருந்தை சேர்',
+                medicationListTitle: 'உங்கள் மருந்து நினைவூட்டல்கள்',
+                noMedications: 'மருந்து நினைவூட்டல்கள் எதுவும் இல்லை.',
+                
+                // Body Pain Map
+                painMapTitle: 'உடல் வலி வரைபடம்',
+                painMapDescription: 'உடலின் எந்தப் பகுதியில் வலி இருக்கிறதோ, அதைத் தொட்டு வலி மற்றும் அதன் விளக்கத்தை சேர்க்கவும்.',
+                painMapNote: 'நீங்கள் வலியை நீக்க அதை மீண்டும் அழுத்தலாம்.',
+                painDescriptionPlaceholder: 'வலியின் விளக்கம்...',
+                savePainPointBtn: 'சேமி',
+                
+                // First Aid & Emergency
+                firstAidEmergencyTitle: 'முதலுதவி & அவசரம்',
+                firstAidDescription: 'அவசர காலங்களில் உதவிகள் மற்றும் தகவல்களை பெறவும்.',
+                emergencyContactsTitle: 'அவசர தொடர்புகள்',
+                contactNamePlaceholder: 'பெயர்',
+                contactNumberPlaceholder: 'அலைபேசி எண்',
+                addContactBtn: 'தொடர்பை சேர்',
+                callBtn: 'அழைப்பு',
+                
+                // All other AI-powered features
+                aiTipTitle: 'AI உதவிக்குறிப்பு',
+                aiTipPlaceholder: 'உங்கள் குறிப்பு இங்கே தோன்றும்.',
+                
                 // Modals & Alerts
                 modalSuccessTitle: 'வெற்றி!',
                 modalErrorTitle: 'பிழை!',
@@ -160,8 +214,6 @@
                 ttsSpeaking: 'பேசுகிறது...',
                 ttsLoadingVoices: 'குரல்கள் ஏற்றப்படுகிறது...',
                 ttsNoVoices: 'இந்த மொழிக்கு குரல்கள் கிடைக்கவில்லை.',
-                aiTipTitle: 'AI உதவிக்குறிப்பு',
-                aiTipPlaceholder: 'உங்கள் குறிப்பு இங்கே தோன்றும்.',
                 selectLanguage: 'மொழித் தேர்வு',
             },
             en: {
@@ -246,9 +298,35 @@
                 journalEntriesOutputDefault: 'Your journal entries will appear here.',
                 analyzeMoodJournalBtn: 'Analyze Mood',
                 moodAnalysisOutputDefault: 'Your mood analysis will appear here.',
+                
+                // Medication Reminder
+                medicationTitle: 'Medication Reminder',
+                medicineNamePlaceholder: 'Medicine Name',
+                dosagePlaceholder: 'Dosage (e.g., 1 tablet)',
+                timePlaceholder: 'Time (HH:MM)',
+                addMedicationBtn: 'Add Medicine',
+                medicationListTitle: 'Your Medication Reminders',
+                noMedications: 'No medication reminders set.',
 
-                // General page
-                generalPageDefault: 'This feature is not yet developed. It will be added in the future!',
+                // Body Pain Map
+                painMapTitle: 'Body Pain Map',
+                painMapDescription: 'Tap on a body part to add a pain description.',
+                painMapNote: 'You can tap on the pain point again to remove it.',
+                painDescriptionPlaceholder: 'Description of pain...',
+                savePainPointBtn: 'Save',
+
+                // First Aid & Emergency
+                firstAidEmergencyTitle: 'First Aid & Emergency',
+                firstAidDescription: 'Get help and information for emergencies.',
+                emergencyContactsTitle: 'Emergency Contacts',
+                contactNamePlaceholder: 'Name',
+                contactNumberPlaceholder: 'Phone Number',
+                addContactBtn: 'Add Contact',
+                callBtn: 'Call',
+                
+                // All other AI-powered features
+                aiTipTitle: 'AI Tip',
+                aiTipPlaceholder: 'Your tip will appear here.',
 
                 // Modals & Alerts
                 modalSuccessTitle: 'Success!',
@@ -278,8 +356,6 @@
                 ttsSpeaking: 'Speaking...',
                 ttsLoadingVoices: 'Loading voices...',
                 ttsNoVoices: 'No voices available for this language.',
-                aiTipTitle: 'AI Tip',
-                aiTipPlaceholder: 'Your tip will appear here.',
                 selectLanguage: 'Select Language',
             },
         };
@@ -300,7 +376,7 @@
         
         let waterIntake = 0;
         let journalEntry = '';
-        let journalEntries = [];
+        let journalEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
         let moodAnalysis = '';
         let healthTipInput = '';
         let healthTipOutput = '';
@@ -310,15 +386,37 @@
         let foodRecipeQuery = '';
         let foodRecipes = [];
         let isFoodLoading = false;
+        let medications = JSON.parse(localStorage.getItem('medications')) || [];
+        let painPoints = JSON.parse(localStorage.getItem('painPoints')) || {};
+        let emergencyContacts = JSON.parse(localStorage.getItem('emergencyContacts')) || [];
 
         // Speech API
         let isListening = false;
         let isSpeaking = false;
-        let recognition;
-        
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.onstart = () => {
+                isListening = true;
+                renderPage();
+            };
+            recognition.onend = () => {
+                isListening = false;
+                renderPage();
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                showModal(t.modalErrorTitle, t.speechRecognitionError);
+                isListening = false;
+                renderPage();
+            };
+        }
+
         const apiKey = ""; // API key is automatically provided at runtime
 
-        // Helper functions
+        // Helper functions for TTS/Audio
         const pcmToWav = (pcmData, sampleRate) => {
             const buffer = new ArrayBuffer(44 + pcmData.byteLength);
             const view = new DataView(buffer);
@@ -340,7 +438,7 @@
             view.setUint16(34, 16, true); // Bits per sample
             writeString(view, 36, 'data');
             view.setUint32(40, pcmData.byteLength, true);
-            new Int16Array(buffer, 44).set(pcmData);
+            new Int16Array(buffer, 44).set(new Int16Array(pcmData));
             return new Blob([buffer], { type: 'audio/wav' });
         };
 
@@ -353,21 +451,19 @@
             }
             return bytes.buffer;
         };
-
-        // Modal functions
+        
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal').classList.add('flex');
+            document.getElementById('alert-modal').classList.remove('hidden');
+            document.getElementById('alert-modal').classList.add('flex');
         }
 
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            document.getElementById('modal').classList.remove('flex');
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
         }
 
-        // API call with exponential backoff
         async function callApiWithBackoff(apiCall, maxRetries = 5, delay = 1000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
@@ -384,14 +480,14 @@
             }
         }
 
-        // Language switching
         function switchLanguage(lang) {
             currentLang = lang;
             t = translations[currentLang];
             renderPage();
         }
 
-        // Function to generate a health tip using the Gemini API
+        // Feature-specific logic
+        
         async function generateHealthTip() {
             const input = document.getElementById('healthTipInput').value;
             if (!input.trim()) {
@@ -400,14 +496,11 @@
             }
             isLoading = true;
             renderPage();
-
             try {
-                // Determine the language for the prompt
                 const langName = currentLang === 'ta' ? 'தமிழ்' : 'English';
                 const prompt = `User's health goal: "${input}". Based on this goal, generate a short, useful, personalized health tip in ${langName}. The tip should be under 50 words.`;
                 const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
-
                 const apiCall = async () => {
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const response = await fetch(apiUrl, {
@@ -418,9 +511,7 @@
                     if (!response.ok) throw new Error('API request failed');
                     return response.json();
                 };
-                
                 const result = await callApiWithBackoff(apiCall);
-
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
@@ -446,7 +537,6 @@
             isFoodLoading = true;
             renderPage();
             foodRecipes = []; // Clear previous recipes
-
             try {
                 const prompt = `செய்முறையின் பெயர் "${query}" அல்லது அதில் உள்ள பொருட்கள் "${query}"-ஐ அடிப்படையாகக் கொண்டு, தமிழில் 3 உணவு செய்முறைகளைக் கண்டறிந்து, ஒவ்வொரு செய்முறைக்கும் தேவையான பொருட்கள் மற்றும் செய்முறை வழிமுறைகளுடன் ஒரு JSON கட்டமைப்பில் உள்ளீட்டை வழங்கவும். JSON கட்டமைப்பு பின்வருமாறு இருக்க வேண்டும்: Array of Objects, ஒவ்வொரு பொருளுக்கும் "recipeName", "ingredients" (Array of Strings), மற்றும் "instructions" (Array of Strings).`;
                 const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
@@ -505,8 +595,7 @@
                 renderPage();
             }
         }
-
-
+        
         async function getAiTipForQuery(query, featureName) {
             if (!query.trim()) {
                 showModal(t.modalErrorTitle, "தயவுசெய்து உங்கள் சந்தேகத்தை உள்ளிடவும்.");
@@ -516,7 +605,8 @@
             renderPage();
 
             try {
-                const prompt = `"${featureName}" என்ற தலைப்பில் உள்ள பயனர் சந்தேகம்: "${query}". இந்த சந்தேகத்திற்கு தமிழில் ஒரு விரிவான, பயனுள்ள குறிப்பை வழங்குங்கள்.`;
+                const langName = currentLang === 'ta' ? 'தமிழ்' : 'English';
+                const prompt = `"${featureName}" என்ற தலைப்பில் உள்ள பயனர் சந்தேகம்: "${query}". இந்த சந்தேகத்திற்கு ${langName}-ல் ஒரு விரிவான, பயனுள்ள குறிப்பை வழங்குங்கள்.`;
                 const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
                 
@@ -549,7 +639,6 @@
             }
         }
 
-        // Function to analyze mood
         async function analyzeMood() {
             if (journalEntries.length === 0) {
                 showModal(t.modalErrorTitle, "பகுப்பாய்வு செய்ய நாட்குறிப்பு பதிவுகள் இல்லை.");
@@ -590,40 +679,173 @@
                 renderPage();
             }
         }
-
-        // Speech Recognition handlers
-        function startListening(inputElementId) {
-            if (recognition) {
-                recognition.start();
-                isListening = true;
-                renderPage();
-
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById(inputElementId).value = transcript;
-                    // Update state if necessary
-                    if (inputElementId === 'healthTipInput') healthTipInput = transcript;
-                    if (inputElementId === 'journalEntryInput') journalEntry = transcript;
-                    if (inputElementId === 'foodRecipeInput') foodRecipeQuery = transcript;
-                    if (inputElementId.startsWith('searchQuery')) {
-                        const featureName = document.getElementById('feature-title').textContent;
-                        getAiTipForQuery(transcript, featureName);
-                    }
-                };
-
-            } else {
-                showModal(t.modalErrorTitle, t.speechRecognitionError);
+        
+        // General purpose functions for the new features
+        function startStepTracking() {
+            if (!isStepTracking) {
+                isStepTracking = true;
+                stepInterval = setInterval(() => {
+                    steps++;
+                    renderPage();
+                }, 1000); // Simulating one step per second
             }
         }
 
-        // TTS handlers
-        async function speakText(text) {
-            if (isSpeaking) {
+        function stopStepTracking() {
+            isStepTracking = false;
+            if (stepInterval) clearInterval(stepInterval);
+        }
+
+        function resetSteps() {
+            steps = 0;
+            renderPage();
+        }
+        
+        function startHeartRateMeasuring() {
+            if (!isHeartRateMeasuring) {
+                isHeartRateMeasuring = true;
+                heartRateInterval = setInterval(() => {
+                    heartRate = Math.floor(60 + Math.random() * 40); // Simulate BPM
+                    renderPage();
+                }, 2000);
+            }
+        }
+
+        function stopHeartRateMeasuring() {
+            isHeartRateMeasuring = false;
+            if (heartRateInterval) clearInterval(heartRateInterval);
+        }
+        
+        function resetHeartRate() {
+            heartRate = 0;
+            renderPage();
+        }
+
+        function addWater() {
+            waterIntake += 250;
+            renderPage();
+        }
+
+        function resetWater() {
+            waterIntake = 0;
+            renderPage();
+        }
+
+        function saveJournalEntry() {
+            const entryText = document.getElementById('journalEntryInput').value;
+            if (entryText.trim()) {
+                journalEntries.push({ date: new Date().toLocaleDateString(), entry: entryText });
+                localStorage.setItem('journalEntries', JSON.stringify(journalEntries));
+                document.getElementById('journalEntryInput').value = '';
+                showModal(t.modalSuccessTitle, t.modalJournalSaved);
+                renderPage();
+            } else {
+                showModal(t.modalErrorTitle, t.modalJournalError);
+            }
+        }
+
+        function addMedication() {
+            const name = document.getElementById('medicineName').value;
+            const dosage = document.getElementById('dosage').value;
+            const time = document.getElementById('medicationTime').value;
+            if (name && dosage && time) {
+                medications.push({ name, dosage, time });
+                localStorage.setItem('medications', JSON.stringify(medications));
+                document.getElementById('medicineName').value = '';
+                document.getElementById('dosage').value = '';
+                document.getElementById('medicationTime').value = '';
+                showModal(t.modalSuccessTitle, t.modalMedicineAdded);
+                renderPage();
+            } else {
+                showModal(t.modalErrorTitle, t.modalMedicineError);
+            }
+        }
+
+        function removeMedication(index) {
+            medications.splice(index, 1);
+            localStorage.setItem('medications', JSON.stringify(medications));
+            showModal(t.modalSuccessTitle, t.modalMedicineRemoved);
+            renderPage();
+        }
+
+        function startAlarmCheck() {
+            setInterval(() => {
+                const now = new Date();
+                const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                medications.forEach(med => {
+                    if (med.time === currentTime) {
+                        showModal(t.alarmModalTitle, `${t.alarmModalMessage} ${med.name}`);
+                    }
+                });
+            }, 60000); // Check every minute
+        }
+        
+        function handlePainPointClick(event) {
+            const part = event.target.id;
+            const isPainPoint = painPoints.hasOwnProperty(part);
+
+            if (isPainPoint) {
+                delete painPoints[part];
+                localStorage.setItem('painPoints', JSON.stringify(painPoints));
+                showModal(t.modalSuccessTitle, t.modalPainPointRemoved);
+            } else {
+                const description = prompt(t.painDescriptionPlaceholder);
+                if (description) {
+                    painPoints[part] = description;
+                    localStorage.setItem('painPoints', JSON.stringify(painPoints));
+                    showModal(t.modalSuccessTitle, t.modalPainPointSaved);
+                } else {
+                    showModal(t.modalErrorTitle, t.modalPainPointError);
+                }
+            }
+            renderPage();
+        }
+
+        function addEmergencyContact() {
+            const name = document.getElementById('contactName').value;
+            const number = document.getElementById('contactNumber').value;
+            if (name && number) {
+                emergencyContacts.push({ name, number });
+                localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactNumber').value = '';
+                showModal(t.modalSuccessTitle, t.modalContactAdded);
+                renderPage();
+            } else {
+                showModal(t.modalErrorTitle, t.modalContactError);
+            }
+        }
+
+        function removeEmergencyContact(index) {
+            emergencyContacts.splice(index, 1);
+            localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+            showModal(t.modalSuccessTitle, t.modalContactRemoved);
+            renderPage();
+        }
+        
+        function callContact(number) {
+             window.location.href = `tel:${number}`;
+        }
+
+        // Voice API functions
+        function startListening(inputElementId, callback) {
+            if (!recognition) {
+                showModal(t.modalErrorTitle, t.speechRecognitionError);
                 return;
             }
+            recognition.lang = currentLang === 'ta' ? 'ta-IN' : 'en-US';
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById(inputElementId).value = transcript;
+                if (callback) callback(transcript);
+            };
+            recognition.start();
+        }
+        
+        async function speakText(text) {
+            if (isSpeaking || !text.trim()) return;
             isSpeaking = true;
             renderPage();
-
             try {
                 const payload = {
                     contents: [{ parts: [{ text }] }],
@@ -631,7 +853,7 @@
                         responseModalities: ["AUDIO"],
                         speechConfig: {
                             voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName: "Algieba" }
+                                prebuiltVoiceConfig: { voiceName: currentLang === 'ta' ? 'Algieba' : 'Leda' }
                             }
                         }
                     },
@@ -648,16 +870,17 @@
                     if (!response.ok) throw new Error('API request failed');
                     return response.json();
                 };
-                
-                const apiResponse = await callApiWithBackoff(apiCall);
-                const part = apiResponse?.candidates?.[0]?.content?.parts?.[0];
+
+                const result = await callApiWithBackoff(apiCall);
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
                 const audioData = part?.inlineData?.data;
                 const mimeType = part?.inlineData?.mimeType;
 
                 if (audioData && mimeType && mimeType.startsWith("audio/")) {
-                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmData);
+                    const audioBuffer = base64ToArrayBuffer(audioData);
+                    const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 16000;
+                    const pcm16 = new Int16Array(audioBuffer);
                     const wavBlob = pcmToWav(pcm16, sampleRate);
                     const audioUrl = URL.createObjectURL(wavBlob);
                     const audio = new Audio(audioUrl);
@@ -667,576 +890,688 @@
                     };
                     audio.play();
                 } else {
-                    throw new Error('No audio data or invalid mime type in API response.');
+                    throw new Error('No audio data received');
                 }
             } catch (error) {
-                console.error('TTS API error:', error);
+                console.error("TTS Error:", error);
                 showModal(t.modalErrorTitle, t.ttsError);
                 isSpeaking = false;
                 renderPage();
             }
         }
-
-        // Event handler for feature clicks
-        function handleFeatureClick(feature) {
-             navigateToPage(feature);
-        }
         
-        function navigateToPage(pageName) {
-            // Clear any active intervals or state before navigating
-            if (isStepTracking) stopAutoStepTracking();
-            if (isHeartRateMeasuring) stopHeartRateMeasuring();
-            aiTipOutput = ''; // Clear AI tip on page change
-            currentPage = pageName;
+        function login() {
+            isAuthenticated = true;
+            currentPage = 'main';
+            startAlarmCheck();
             renderPage();
         }
 
-        // Automatic Step Tracker
-        function toggleStepTracking() {
-            if (isStepTracking) {
-                stopAutoStepTracking();
-            } else {
-                startAutoStepTracking();
-            }
-        }
-        function startAutoStepTracking() {
-            isStepTracking = true;
-            // Simulate a more realistic human walking pace (e.g., 120 steps/min)
-            stepInterval = setInterval(() => {
-                steps += 1; // Increment by 1 step every half-second
-                renderPage();
-            }, 500);
-            renderPage();
-        }
-        function stopAutoStepTracking() {
-            isStepTracking = false;
-            clearInterval(stepInterval);
-            renderPage();
-        }
-        function resetSteps() {
-            stopAutoStepTracking();
-            steps = 0;
+        function logout() {
+            isAuthenticated = false;
+            currentPage = 'login';
             renderPage();
         }
 
-        // Automatic Heart Rate Measuring
-        function toggleHeartRateMeasuring() {
-            if (isHeartRateMeasuring) {
-                stopHeartRateMeasuring();
-            } else {
-                startHeartRateMeasuring();
-            }
-        }
-        function startHeartRateMeasuring() {
-            isHeartRateMeasuring = true;
-            heartRateInterval = setInterval(() => {
-                heartRate = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
-                renderPage();
-            }, 2000);
-            renderPage();
-        }
-        function stopHeartRateMeasuring() {
-            isHeartRateMeasuring = false;
-            clearInterval(heartRateInterval);
-            heartRate = 0; // Reset heart rate when stopping
-            renderPage();
-        }
-        function resetHeartRate() {
-            stopHeartRateMeasuring();
-            heartRate = 0;
-            renderPage();
-        }
-        
-        // Reusable search component
-        function renderSearchAndTipSection(featureName) {
-            const searchInputId = `searchQuery-${currentPage}`;
-            return `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
-                        <input
-                            id="${searchInputId}"
-                            type="text"
-                            placeholder="${t.searchPlaceholder}"
-                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <button id="micBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
-                        </button>
-                        <button
-                            id="searchBtn"
-                            class="p-3 text-white font-bold rounded-lg transition-colors ${isSearchLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
-                            ${isSearchLoading ? 'disabled' : ''}
-                        >
-                            ${t.searchBtn}
-                        </button>
-                    </div>
-                    ${aiTipOutput ? `
-                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-start">
-                        <h3 class="font-semibold text-lg mb-2">${t.aiTipTitle}</h3>
-                        <p class="flex-grow">${aiTipOutput}</p>
-                        <button id="speakTipBtn" class="ml-4 p-2 rounded-full text-white transition-colors ${isSpeaking ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                            <i class="fas fa-volume-up"></i>
-                        </button>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
-        }
+        // --- Render Functions for different pages ---
 
-        // Function to render a general feature page with search
-        function renderFeaturePage(title, contentHtml, onBackClick, actionsHtml = '') {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="w-full max-w-2xl">
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 id="feature-title" class="text-3xl font-bold">${title}</h1>
-                        <button id="backToFeaturesBtn" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            <i class="fas fa-arrow-left mr-2"></i> ${t.backToFeatures}
-                        </button>
-                    </div>
-                    
-                    ${contentHtml}
-
-                    <div class="flex flex-wrap justify-center gap-4 mt-6">
-                        ${actionsHtml}
-                    </div>
-
-                    ${renderSearchAndTipSection(title)}
-                </div>
-            `;
-            document.getElementById('backToFeaturesBtn').onclick = onBackClick;
-            document.getElementById('searchBtn').onclick = () => {
-                const query = document.getElementById(`searchQuery-${currentPage}`).value;
-                getAiTipForQuery(query, title);
-            };
-            document.getElementById('micBtn').onclick = () => startListening(`searchQuery-${currentPage}`);
-            if (aiTipOutput) {
-                 document.getElementById('speakTipBtn').onclick = () => speakText(aiTipOutput);
-            }
-        }
-        
-
-        // Rendering functions for each page
         function renderLoginPage() {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-screen w-full">
-                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-sm">
-                        <h1 class="text-3xl font-bold mb-4 text-center">${t.loginTitle}</h1>
-                        <p class="text-center mb-6">${t.loginDescription}</p>
-                        <div class="space-y-4">
-                            <input
-                                type="email"
-                                placeholder="${t.emailPlaceholder}"
-                                class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <input
-                                type="password"
-                                placeholder="${t.passwordPlaceholder}"
-                                class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <button
-                                id="loginBtn"
-                                class="w-full p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors"
-                            >
+            return `
+                <div class="flex flex-col items-center justify-center min-h-screen p-4">
+                    <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-center text-blue-600 dark:text-blue-400 text-shadow">
+                        ${t.loginTitle}
+                    </h1>
+                    <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-6 text-center">
+                        ${t.loginDescription}
+                    </p>
+                    <div class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 space-y-4">
+                        <input type="email" id="email" placeholder="${t.emailPlaceholder}" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                        <input type="password" id="password" placeholder="${t.passwordPlaceholder}" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                            <button onclick="login()" class="w-full sm:w-1/2 p-3 rounded-xl text-white font-bold bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg">
                                 ${t.loginBtn}
                             </button>
-                            <button
-                                id="registerBtn"
-                                class="w-full p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                            >
+                            <button onclick="login()" class="w-full sm:w-1/2 p-3 rounded-xl text-blue-500 font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-lg">
                                 ${t.registerBtn}
                             </button>
                         </div>
                     </div>
                 </div>
             `;
-            document.getElementById('loginBtn').onclick = () => { isAuthenticated = true; navigateToPage('main'); };
-            document.getElementById('registerBtn').onclick = () => showModal(t.modalSuccessTitle, t.modalSaveSuccess);
         }
 
+        function renderHeader() {
+            return `
+                <header class="w-full flex justify-between items-center py-4 px-2 sm:px-4 mb-6">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        ${t.mainTitle}
+                    </h1>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="document.getElementById('lang-modal').classList.remove('hidden');" class="p-2 rounded-full text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-globe text-xl"></i>
+                        </button>
+                        <button onclick="logout()" class="p-2 px-4 rounded-full text-white bg-red-500 hover:bg-red-600 transition-colors text-sm sm:text-base">
+                            ${t.logoutBtn}
+                        </button>
+                    </div>
+                </header>
+            `;
+        }
+        
         function renderMainPage() {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="w-full max-w-4xl">
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-4xl font-bold">${t.mainTitle}</h1>
-                        <div class="flex space-x-2">
-                             <div class="relative inline-block text-left">
-                                <select id="language-switcher" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                                    <option value="ta" ${currentLang === 'ta' ? 'selected' : ''}>தமிழ்</option>
-                                    <option value="en" ${currentLang === 'en' ? 'selected' : ''}>English</option>
-                                </select>
-                             </div>
-                            <button id="showFeaturesBtn" class="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-                                <i class="fas fa-list-ul mr-2"></i> ${t.showFeaturesLabel}
-                            </button>
-                            <button id="logoutBtn" class="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
-                                <i class="fas fa-sign-out-alt mr-2"></i> ${t.logoutBtn}
+            const loadingHtml = isLoading ? `
+                <div class="flex items-center justify-center p-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span class="ml-4 text-blue-500">${t.loadingText}</span>
+                </div>
+            ` : '';
+            
+            const tipOutputHtml = healthTipOutput ? `
+                <div class="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <p class="text-gray-800 dark:text-gray-200">${healthTipOutput}</p>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="speakText('${healthTipOutput.replace(/'/g, "\\'")}')" class="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors voice-button ${isSpeaking ? 'speaking' : ''}">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+            ` : '';
+
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl space-y-6">
+                    <!-- General Health Tip Section -->
+                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 dark:from-blue-600 dark:to-blue-800 p-6 rounded-2xl shadow-lg text-white">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-2">${t.tipSectionTitle}</h2>
+                        <p class="text-sm sm:text-base opacity-90 mb-4">${t.descriptionText}</p>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="healthTipInput" placeholder="${t.searchPlaceholder}" value="${healthTipInput}" class="flex-grow p-3 rounded-lg border-none focus:outline-none text-gray-900 bg-white">
+                            <button onclick="startListening('healthTipInput')" class="p-3 bg-blue-700 hover:bg-blue-800 transition-colors rounded-lg text-white voice-button ${isListening ? 'listening' : ''}">
+                                <i class="fas fa-microphone"></i>
                             </button>
                         </div>
+                        <button onclick="generateHealthTip()" class="w-full mt-4 p-3 rounded-xl bg-blue-700 hover:bg-blue-800 transition-colors font-bold shadow-md">
+                            ${t.generateBtn}
+                        </button>
+                        ${loadingHtml}
+                        ${tipOutputHtml}
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                        <h2 class="text-2xl font-bold mb-4">${t.tipSectionTitle}</h2>
-                        <p class="mb-4">${t.descriptionText}</p>
-                        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
-                            <input
-                                id="healthTipInput"
-                                type="text"
-                                value="${healthTipInput}"
-                                placeholder="${t.generalHealthTipLabel}"
-                                class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <button id="startListeningBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                                <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
-                            </button>
-                        </div>
-                        <button
-                            id="generateBtn"
-                            class="w-full p-3 text-white font-bold rounded-lg transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
-                            ${isLoading ? 'disabled' : ''}
-                        >
-                            ${isLoading ? t.loadingText : t.generateBtn}
+                    <!-- Features Section -->
+                    <div class="flex flex-col items-center">
+                        <button onclick="navigateTo('features')" class="p-3 px-6 rounded-full text-white font-bold bg-purple-500 hover:bg-purple-600 transition-colors shadow-lg">
+                            ${t.showFeaturesLabel}
                         </button>
-                        ${healthTipOutput ? `
-                        <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-start">
-                            <p class="flex-grow">${healthTipOutput}</p>
-                            <button id="speakBtn" class="ml-4 p-2 rounded-full text-white transition-colors ${isSpeaking ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                        </div>
-                        ` : ''}
                     </div>
-                </div>
+                </main>
             `;
-            document.getElementById('language-switcher').onchange = (e) => {
-                switchLanguage(e.target.value);
-                // When language changes, clear previous AI tip so it re-generates in the new language
-                healthTipOutput = '';
-                renderPage();
-            };
-            document.getElementById('showFeaturesBtn').onclick = () => navigateToPage('features');
-            document.getElementById('logoutBtn').onclick = () => { isAuthenticated = false; navigateToPage('login'); };
-            document.getElementById('generateBtn').onclick = generateHealthTip;
-            document.getElementById('startListeningBtn').onclick = () => startListening('healthTipInput');
-            if (healthTipOutput) {
-                 document.getElementById('speakBtn').onclick = () => speakText(healthTipOutput);
-            }
-            document.getElementById('healthTipInput').oninput = (e) => { healthTipInput = e.target.value; };
         }
 
         function renderFeaturesPage() {
-            const app = document.getElementById('app');
-            const featureCards = [
-                { label: t.foodRecipesLabel, icon: "fas fa-utensils", page: 'foodRecipes' },
-                { label: t.stepTrackerLabel, icon: "fas fa-walking", page: 'stepTracker' },
-                { label: t.heartRateTrackerLabel, icon: "fas fa-heartbeat", page: 'heartRateTracker' },
-                { label: t.waterTrackerLabel, icon: "fas fa-tint", page: 'waterTracker' },
-                { label: t.journalLabel, icon: "fas fa-book", page: 'journal' },
-                { label: t.moodAnalysisLabel, icon: "fas fa-grin-alt", page: 'moodAnalysis' },
-                { label: t.localTipsLabel, icon: "fas fa-map-marker-alt", page: 'localTips' },
-                { label: t.mealPlanLabel, icon: "fas fa-utensils", page: 'mealPlan' },
-                { label: t.exerciseYogaLabel, icon: "fas fa-running", page: 'exerciseYoga' },
-                { label: t.diseasePreventionLabel, icon: "fas fa-shield-alt", page: 'diseasePrevention' },
-                { label: t.wellnessChallengeLabel, icon: "fas fa-trophy", page: 'wellnessChallenge' },
-                { label: t.medicationReminderLabel, icon: "fas fa-pills", page: 'medicationReminder' },
-                { label: t.bodyPainMappingLabel, icon: "fas fa-user", page: 'bodyPainMapping' },
-                { label: t.firstAidEmergencyLabel, icon: "fas fa-ambulance", page: 'firstAidEmergency' },
-                { label: t.symptomCheckerLabel, icon: "fas fa-stethoscope", page: 'symptomChecker' },
-            ];
-
-            const featureHtml = featureCards.map(card => `
-                <div
-                    id="card-${card.page}"
-                    class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                    <i class="${card.icon} text-4xl mb-4 text-blue-500"></i>
-                    <span class="font-semibold">${card.label}</span>
-                </div>
-            `).join('');
-
-            app.innerHTML = `
-                <div class="w-full max-w-4xl">
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-4xl font-bold">${t.featuresPageTitle}</h1>
-                        <button id="backToMainBtn" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            <i class="fas fa-arrow-left mr-2"></i> ${t.backToMain}
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">${t.featuresPageTitle}</h2>
+                        <button onclick="navigateTo('main')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToMain}
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        ${featureHtml}
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('foodRecipes')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-yellow-400 text-white rounded-2xl shadow-lg hover:bg-yellow-500 transition-colors">
+                                <i class="fas fa-utensils text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.foodRecipesLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('stepTracker')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-green-500 text-white rounded-2xl shadow-lg hover:bg-green-600 transition-colors">
+                                <i class="fas fa-walking text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.stepTrackerLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('heartRate')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-red-500 text-white rounded-2xl shadow-lg hover:bg-red-600 transition-colors">
+                                <i class="fas fa-heartbeat text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.heartRateTrackerLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('waterTracker')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-blue-500 text-white rounded-2xl shadow-lg hover:bg-blue-600 transition-colors">
+                                <i class="fas fa-glass-whiskey text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.waterTrackerLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('journal')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-indigo-500 text-white rounded-2xl shadow-lg hover:bg-indigo-600 transition-colors">
+                                <i class="fas fa-book-open text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.journalLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('localTips')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-orange-500 text-white rounded-2xl shadow-lg hover:bg-orange-600 transition-colors">
+                                <i class="fas fa-map-marked-alt text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.localTipsLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('mealPlan')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-teal-500 text-white rounded-2xl shadow-lg hover:bg-teal-600 transition-colors">
+                                <i class="fas fa-apple-alt text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.mealPlanLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('exerciseYoga')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-pink-500 text-white rounded-2xl shadow-lg hover:bg-pink-600 transition-colors">
+                                <i class="fas fa-dumbbell text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.exerciseYogaLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('diseasePrevention')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-cyan-500 text-white rounded-2xl shadow-lg hover:bg-cyan-600 transition-colors">
+                                <i class="fas fa-shield-alt text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.diseasePreventionLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('wellnessChallenges')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-lime-500 text-white rounded-2xl shadow-lg hover:bg-lime-600 transition-colors">
+                                <i class="fas fa-medal text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.wellnessChallengeLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('medicationReminder')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-purple-500 text-white rounded-2xl shadow-lg hover:bg-purple-600 transition-colors">
+                                <i class="fas fa-pills text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.medicationReminderLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('bodyPainMap')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-fuchsia-500 text-white rounded-2xl shadow-lg hover:bg-fuchsia-600 transition-colors">
+                                <i class="fas fa-map-pin text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.bodyPainMappingLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('firstAid')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-red-600 text-white rounded-2xl shadow-lg hover:bg-red-700 transition-colors">
+                                <i class="fas fa-first-aid text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.firstAidEmergencyLabel}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <button onclick="navigateTo('symptomChecker')" class="feature-card flex flex-col items-center justify-center w-24 h-24 sm:w-32 sm:h-32 bg-emerald-500 text-white rounded-2xl shadow-lg hover:bg-emerald-600 transition-colors">
+                                <i class="fas fa-stethoscope text-3xl sm:text-4xl"></i>
+                                <span class="text-center mt-2 text-xs sm:text-sm font-bold">${t.symptomCheckerLabel}</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </main>
             `;
-            document.getElementById('backToMainBtn').onclick = () => navigateToPage('main');
-            featureCards.forEach(card => {
-                document.getElementById(`card-${card.page}`).onclick = () => handleFeatureClick(card.page);
-            });
         }
         
         function renderFoodRecipesPage() {
-            const recipeListHtml = foodRecipes.length > 0 ?
-                foodRecipes.map(recipe => `
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-6">
-                        <h3 class="text-2xl font-bold text-blue-500 mb-2">${recipe.recipeName}</h3>
-                        <div class="mb-4">
-                            <h4 class="font-semibold text-lg">${t.ingredientsLabel}</h4>
-                            <ul class="list-disc list-inside mt-2">
-                                ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg">${t.instructionsLabel}</h4>
-                            <ol class="list-decimal list-inside mt-2">
-                                ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
-                            </ol>
-                        </div>
-                    </div>
-                `).join('') :
-                `<p class="text-center text-gray-500 dark:text-gray-400">${isFoodLoading ? t.foodLoadingText : t.noRecipesFound}</p>`;
+            const loadingHtml = isFoodLoading ? `
+                <div class="flex items-center justify-center p-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+                    <span class="ml-4 text-yellow-500">${t.foodLoadingText}</span>
+                </div>
+            ` : '';
 
-            const content = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.foodRecipesDescription}</p>
-                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
-                        <input
-                            id="foodRecipeInput"
-                            type="text"
-                            value="${foodRecipeQuery}"
-                            placeholder="${t.foodSearchPlaceholder}"
-                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <button id="micBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
-                        </button>
-                        <button
-                            id="foodSearchBtn"
-                            class="p-3 text-white font-bold rounded-lg transition-colors ${isFoodLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
-                            ${isFoodLoading ? 'disabled' : ''}
-                        >
-                            ${isFoodLoading ? t.foodLoadingText : t.foodSearchBtn}
-                        </button>
+            const recipesHtml = foodRecipes.map(recipe => `
+                <div class="bg-gray-200 dark:bg-gray-700 p-4 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">${recipe.recipeName}</h3>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200">${t.ingredientsLabel}</h4>
+                        <ul class="list-disc list-inside text-gray-700 dark:text-gray-300">
+                            ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200">${t.instructionsLabel}</h4>
+                        <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300">
+                            ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                        </ol>
                     </div>
                 </div>
-                <div class="max-h-96 overflow-y-auto">
-                    ${recipeListHtml}
-                </div>
+            `).join('');
+
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400" id="feature-title">${t.foodRecipesTitle}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+
+                    <div class="mb-4 flex items-center space-x-2">
+                        <input type="text" id="foodRecipeInput" placeholder="${t.foodSearchPlaceholder}" class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                        <button onclick="startListening('foodRecipeInput')" class="p-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors voice-button ${isListening ? 'listening' : ''}">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button onclick="getFoodRecipes()" class="p-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    ${loadingHtml}
+                    <div class="space-y-4">
+                        ${recipesHtml}
+                    </div>
+                </main>
             `;
-            renderFeaturePage(t.foodRecipesTitle, content, () => navigateToPage('features'));
-            document.getElementById('foodRecipeInput').oninput = (e) => { foodRecipeQuery = e.target.value; };
-            document.getElementById('foodSearchBtn').onclick = getFoodRecipes;
-            document.getElementById('micBtn').onclick = () => startListening('foodRecipeInput');
         }
 
-        function renderStepTrackerPage() {
-            const content = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
-                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${steps}</h2>
-                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.stepTipOutputDefault}</p>
-                </div>
-            `;
-            const actions = `
-                <button id="toggleStepTrackingBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors ${isStepTracking ? 'animate-pulse-slow' : ''}">
-                    <i class="fas fa-running mr-2"></i> ${isStepTracking ? t.stopTrackingBtn : t.startTrackingBtn}
-                </button>
-                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
-                    <i class="fas fa-undo mr-2"></i> ${t.resetStepsBtn}
-                </button>
-            `;
-            renderFeaturePage(t.stepSectionTitle, content, () => navigateToPage('features'), actions);
-            document.getElementById('toggleStepTrackingBtn').onclick = toggleStepTracking;
-            document.getElementById('resetBtn').onclick = resetSteps;
-        }
+        function renderTrackerPage(title, value, unit, startBtnText, stopBtnText, resetBtnText, tipText, startFunc, stopFunc, resetFunc) {
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400" id="feature-title">${title}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
 
-        function renderHeartRateTrackerPage() {
-             const content = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
-                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${heartRate || '0'}</h2>
-                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.heartRateTipOutputDefault}</p>
-                </div>
-            `;
-            const actions = `
-                <button id="toggleHeartRateMeasuringBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors ${isHeartRateMeasuring ? 'animate-pulse-slow' : ''}">
-                    <i class="fas fa-heartbeat mr-2"></i> ${isHeartRateMeasuring ? t.stopMeasuringBtn : t.startMeasuringBtn}
-                </button>
-                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
-                    <i class="fas fa-undo mr-2"></i> ${t.resetHeartRateBtn}
-                </button>
-            `;
-            renderFeaturePage(t.heartRateTrackerLabel, content, () => navigateToPage('features'), actions);
-            document.getElementById('toggleHeartRateMeasuringBtn').onclick = toggleHeartRateMeasuring;
-            document.getElementById('resetBtn').onclick = resetHeartRate;
-        }
+                    <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl shadow-lg text-white mb-6">
+                        <div class="text-5xl sm:text-7xl font-extrabold text-shadow">${value}</div>
+                        <div class="text-xl sm:text-2xl mt-2 font-semibold">${unit}</div>
+                    </div>
 
+                    <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-6">
+                        <button onclick="${startFunc}" class="p-3 px-6 rounded-xl font-bold text-white bg-green-500 hover:bg-green-600 transition-colors shadow-lg">
+                            ${startBtnText}
+                        </button>
+                        <button onclick="${stopFunc}" class="p-3 px-6 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg">
+                            ${stopBtnText}
+                        </button>
+                        <button onclick="${resetFunc}" class="p-3 px-6 rounded-xl font-bold text-gray-900 bg-gray-200 hover:bg-gray-300 transition-colors shadow-lg">
+                            ${resetBtnText}
+                        </button>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                        ${tipText}
+                    </div>
+                </main>
+            `;
+        }
+        
         function renderWaterTrackerPage() {
-            const content = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
-                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${waterIntake} மிலி</h2>
-                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.waterTipOutputDefault}</p>
-                </div>
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400" id="feature-title">${t.waterSectionTitle}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+                    
+                    <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl shadow-lg text-white mb-6">
+                        <i class="fas fa-glass-whiskey text-5xl sm:text-7xl mb-4"></i>
+                        <div class="text-5xl sm:text-7xl font-extrabold text-shadow">${waterIntake} ml</div>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-6">
+                        <button onclick="addWater()" class="p-3 px-6 rounded-xl font-bold text-white bg-blue-500 hover:bg-blue-600 transition-colors shadow-lg">
+                            ${t.addWaterBtn}
+                        </button>
+                        <button onclick="resetWater()" class="p-3 px-6 rounded-xl font-bold text-gray-900 bg-gray-200 hover:bg-gray-300 transition-colors shadow-lg">
+                            ${t.resetWaterBtn}
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-lg text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                        ${t.waterTipOutputDefault}
+                    </div>
+                </main>
             `;
-            const actions = `
-                <button id="addWaterBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
-                    <i class="fas fa-plus mr-2"></i> ${t.addWaterBtn}
-                </button>
-                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
-                    <i class="fas fa-undo mr-2"></i> ${t.resetWaterBtn}
-                </button>
-            `;
-            renderFeaturePage(t.waterTrackerLabel, content, () => navigateToPage('features'), actions);
-            document.getElementById('addWaterBtn').onclick = () => { waterIntake += 250; renderPage(); };
-            document.getElementById('resetBtn').onclick = () => { waterIntake = 0; renderPage(); };
         }
 
         function renderJournalPage() {
-            const journalEntriesHtml = journalEntries.length > 0 ?
-                journalEntries.map(entry => `
-                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">${entry.date}</p>
-                        <p class="mt-2">${entry.entry}</p>
-                    </div>
-                `).join('') :
-                `<p class="text-gray-500 dark:text-gray-400">${t.journalEntriesOutputDefault}</p>`;
+            const entriesHtml = journalEntries.length > 0 ? journalEntries.map(entry => `
+                <div class="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
+                    <p class="text-sm font-bold text-gray-600 dark:text-gray-400">${entry.date}</p>
+                    <p class="mt-1 text-gray-800 dark:text-gray-200">${entry.entry}</p>
+                </div>
+            `).join('') : `<p class="text-center text-gray-500 dark:text-gray-400">${t.journalEntriesOutputDefault}</p>`;
 
-            const content = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.journalDescription}</p>
-                    <div class="flex items-center space-x-4 mb-4">
-                        <textarea
-                            id="journalEntryInput"
-                            placeholder="${t.journalDescription}"
-                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
-                        >${journalEntry}</textarea>
-                        <button id="startListeningJournalBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
-                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+            const moodAnalysisHtml = moodAnalysis ? `
+                <div class="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <h4 class="font-bold mb-2">${t.moodAnalysisLabel}</h4>
+                    <p class="text-gray-800 dark:text-gray-200">${moodAnalysis}</p>
+                </div>
+            ` : `<p class="mt-4 text-center text-gray-500 dark:text-gray-400">${t.moodAnalysisOutputDefault}</p>`;
+
+            const loadingHtml = isLoading ? `
+                <div class="flex items-center justify-center p-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                    <span class="ml-4 text-indigo-500">${t.loadingText}</span>
+                </div>
+            ` : '';
+            
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400" id="feature-title">${t.journalSectionTitle}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
                         </button>
                     </div>
-                    <div class="flex space-x-4">
-                        <button id="saveJournalBtn" class="flex-grow p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
-                            ${t.saveJournalEntryBtn}
-                        </button>
-                        <button id="analyzeMoodBtn" class="flex-grow p-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
-                            ${t.analyzeMoodJournalBtn}
-                        </button>
-                    </div>
-                    ${moodAnalysis ? `
-                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                        <h3 class="font-semibold text-lg">${t.moodAnalysisLabel}</h3>
-                        <p class="mt-2">${moodAnalysis}</p>
-                    </div>
-                    ` : ''}
-                    <div class="mt-8">
-                        <h3 class="text-xl font-bold mb-4">${t.journalEntriesOutputDefault}</h3>
-                        <div class="space-y-4 max-h-60 overflow-y-auto">
-                            ${journalEntriesHtml}
+
+                    <div class="p-6 bg-gradient-to-r from-indigo-400 to-purple-500 dark:from-indigo-600 dark:to-purple-700 rounded-2xl shadow-lg text-white mb-6">
+                        <h3 class="text-xl font-bold mb-2">${t.journalDescription}</h3>
+                        <div class="flex items-center space-x-2">
+                             <textarea id="journalEntryInput" rows="3" placeholder="${t.searchPlaceholder}" class="flex-grow p-3 rounded-lg border-none focus:outline-none text-gray-900 bg-white"></textarea>
+                            <button onclick="startListening('journalEntryInput')" class="p-3 bg-indigo-700 hover:bg-indigo-800 transition-colors rounded-lg text-white voice-button ${isListening ? 'listening' : ''}">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-4">
+                            <button onclick="saveJournalEntry()" class="w-full p-3 rounded-xl bg-indigo-700 hover:bg-indigo-800 transition-colors font-bold shadow-md">
+                                ${t.saveJournalEntryBtn}
+                            </button>
+                            <button onclick="analyzeMood()" class="w-full p-3 rounded-xl bg-purple-700 hover:bg-purple-800 transition-colors font-bold shadow-md">
+                                ${t.analyzeMoodJournalBtn}
+                            </button>
                         </div>
                     </div>
-                </div>
+                    
+                    ${loadingHtml}
+                    
+                    <div id="moodAnalysisResult">
+                        ${moodAnalysisHtml}
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-6">${t.journalEntriesOutputDefault}</h3>
+                        ${entriesHtml}
+                    </div>
+                </main>
             `;
-            renderFeaturePage(t.journalSectionTitle, content, () => navigateToPage('features'));
-            document.getElementById('saveJournalBtn').onclick = () => {
-                const entry = document.getElementById('journalEntryInput').value;
-                if (entry.trim()) {
-                    journalEntries.push({ entry, date: new Date().toLocaleString() });
-                    journalEntry = '';
-                    showModal(t.modalSuccessTitle, t.modalJournalSaved);
-                    renderPage();
-                } else {
-                    showModal(t.modalErrorTitle, "பதிவு காலியாக உள்ளது.");
-                }
-            };
-            document.getElementById('analyzeMoodBtn').onclick = analyzeMood;
-            document.getElementById('startListeningJournalBtn').onclick = () => startListening('journalEntryInput');
-            document.getElementById('journalEntryInput').oninput = (e) => { journalEntry = e.target.value; };
         }
 
-        // Main rendering logic
-        function renderPage() {
-            const app = document.getElementById('app');
-            app.classList.remove('justify-center');
-            app.classList.remove('h-screen');
+        function renderAiTipPage(featureName, color) {
+            const loadingHtml = isSearchLoading ? `
+                <div class="flex items-center justify-center p-4">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-${color}-500"></div>
+                    <span class="ml-4 text-${color}-500">${t.searchLoading}</span>
+                </div>
+            ` : '';
+            
+            const tipOutputHtml = aiTipOutput ? `
+                <div class="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <p class="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">${aiTipOutput}</p>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="speakText('${aiTipOutput.replace(/'/g, "\\'")}')" class="p-2 rounded-full bg-${color}-500 text-white hover:bg-${color}-600 transition-colors voice-button ${isSpeaking ? 'speaking' : ''}">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+            ` : `<p class="mt-4 text-center text-gray-500 dark:text-gray-400">${t.aiTipPlaceholder}</p>`;
 
-            switch (currentPage) {
-                case 'login':
-                    app.classList.add('justify-center', 'h-screen');
-                    renderLoginPage();
-                    break;
-                case 'main':
-                    renderMainPage();
-                    break;
-                case 'features':
-                    renderFeaturesPage();
-                    break;
-                case 'foodRecipes':
-                    renderFoodRecipesPage();
-                    break;
-                case 'stepTracker':
-                    renderStepTrackerPage();
-                    break;
-                case 'heartRateTracker':
-                    renderHeartRateTrackerPage();
-                    break;
-                case 'waterTracker':
-                    renderWaterTrackerPage();
-                    break;
-                case 'journal':
-                case 'moodAnalysis':
-                     renderJournalPage();
-                     break;
-                case 'localTips':
-                     renderFeaturePage(t.localTipsLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'mealPlan':
-                     renderFeaturePage(t.mealPlanLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'exerciseYoga':
-                     renderFeaturePage(t.exerciseYogaLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'diseasePrevention':
-                     renderFeaturePage(t.diseasePreventionLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'wellnessChallenge':
-                     renderFeaturePage(t.wellnessChallengeLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'medicationReminder':
-                     renderFeaturePage(t.medicationReminderLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'bodyPainMapping':
-                     renderFeaturePage(t.bodyPainMappingLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'firstAidEmergency':
-                     renderFeaturePage(t.firstAidEmergencyLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                case 'symptomChecker':
-                     renderFeaturePage(t.symptomCheckerLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
-                     break;
-                default:
-                    renderLoginPage();
-                    break;
-            }
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-${color}-600 dark:text-${color}-400" id="feature-title">${featureName}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="searchQuery" placeholder="${t.searchPlaceholder}" class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-${color}-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <button onclick="startListening('searchQuery', (query) => getAiTipForQuery(query, '${featureName}'))" class="p-3 bg-${color}-500 text-white rounded-lg hover:bg-${color}-600 transition-colors voice-button ${isListening ? 'listening' : ''}">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button onclick="getAiTipForQuery(document.getElementById('searchQuery').value, '${featureName}')" class="p-3 bg-${color}-500 text-white rounded-lg hover:bg-${color}-600 transition-colors">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        ${loadingHtml}
+                        ${tipOutputHtml}
+                    </div>
+                </main>
+            `;
         }
         
-        // Initial setup on window load
-        window.onload = function() {
-             if ('webkitSpeechRecognition' in window) {
-                recognition = new window.webkitSpeechRecognition();
-                recognition.continuous = false;
-                recognition.lang = 'ta-IN';
-                recognition.interimResults = false;
-                recognition.onstart = () => { isListening = true; renderPage(); };
-                recognition.onend = () => { isListening = false; renderPage(); };
-                recognition.onerror = (event) => {
-                    showModal(t.modalErrorTitle, t.speechRecognitionError + ' - ' + event.error);
-                    isListening = false;
-                    renderPage();
-                };
-            }
+        function renderMedicationReminderPage() {
+             const medicationsHtml = medications.length > 0 ? medications.map((med, index) => `
+                <div class="flex items-center justify-between p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-200">${med.name} - ${med.dosage}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${t.timePlaceholder}: ${med.time}</p>
+                    </div>
+                    <button onclick="removeMedication(${index})" class="p-2 text-white bg-red-500 rounded-full hover:bg-red-600 transition-colors">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('') : `<p class="text-center text-gray-500 dark:text-gray-400">${t.noMedications}</p>`;
+            
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400" id="feature-title">${t.medicationReminderLabel}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 bg-purple-100 dark:bg-purple-900 rounded-2xl shadow-lg mb-6">
+                        <h3 class="text-xl font-bold text-purple-600 dark:text-purple-400 mb-4">${t.medicationTitle}</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="medicineName" placeholder="${t.medicineNamePlaceholder}" class="w-full p-3 rounded-lg border border-purple-300 dark:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <input type="text" id="dosage" placeholder="${t.dosagePlaceholder}" class="w-full p-3 rounded-lg border border-purple-300 dark:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <input type="time" id="medicationTime" placeholder="${t.timePlaceholder}" class="w-full p-3 rounded-lg border border-purple-300 dark:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <button onclick="addMedication()" class="w-full p-3 rounded-xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors shadow-md">
+                                ${t.addMedicationBtn}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-purple-600 dark:text-purple-400 mb-4">${t.medicationListTitle}</h3>
+                    <div class="space-y-4">
+                        ${medicationsHtml}
+                    </div>
+                </main>
+            `;
+        }
 
+        function renderBodyPainMapPage() {
+            const painPointsHtml = Object.keys(painPoints).map(part => {
+                const description = painPoints[part];
+                return `<div class="p-2 bg-red-500 text-white rounded-lg text-sm mb-2">${part}: ${description}</div>`;
+            }).join('');
+            
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-fuchsia-600 dark:text-fuchsia-400" id="feature-title">${t.bodyPainMappingLabel}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-fuchsia-100 dark:bg-fuchsia-900 rounded-2xl shadow-lg flex flex-col items-center">
+                        <p class="text-gray-700 dark:text-gray-300 mb-2 text-center">${t.painMapDescription}</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs mb-4 text-center">${t.painMapNote}</p>
+                        <svg class="w-full h-auto max-w-sm" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" onclick="handlePainPointClick(event)">
+                            <style>
+                                .body-part { fill: #c084fc; stroke: #a855f7; stroke-width: 1; transition: fill 0.2s; }
+                                .body-part:hover { fill: #9333ea; }
+                                .pain-point { fill: #ef4444; }
+                            </style>
+                            <!-- Head -->
+                            <path id="head" d="M100 20 C120 20, 130 50, 100 70 C70 50, 80 20, 100 20 Z" class="body-part ${painPoints.head ? 'pain-point' : ''}"></path>
+                            <!-- Neck -->
+                            <rect id="neck" x="90" y="70" width="20" height="10" class="body-part ${painPoints.neck ? 'pain-point' : ''}"></rect>
+                            <!-- Torso -->
+                            <path id="torso" d="M80 80 Q100 120, 120 80 L120 200 C120 220, 80 220, 80 200 Z" class="body-part ${painPoints.torso ? 'pain-point' : ''}"></path>
+                            <!-- Arms -->
+                            <rect id="left-arm" x="65" y="85" width="10" height="115" rx="5" class="body-part ${painPoints['left-arm'] ? 'pain-point' : ''}"></rect>
+                            <rect id="right-arm" x="125" y="85" width="10" height="115" rx="5" class="body-part ${painPoints['right-arm'] ? 'pain-point' : ''}"></rect>
+                            <!-- Legs -->
+                            <rect id="left-leg" x="85" y="220" width="15" height="130" rx="5" class="body-part ${painPoints['left-leg'] ? 'pain-point' : ''}"></rect>
+                            <rect id="right-leg" x="100" y="220" width="15" height="130" rx="5" class="body-part ${painPoints['right-leg'] ? 'pain-point' : ''}"></rect>
+                            <!-- Hands & Feet (simple circles) -->
+                            <circle id="left-hand" cx="70" cy="200" r="5" class="body-part ${painPoints['left-hand'] ? 'pain-point' : ''}"></circle>
+                            <circle id="right-hand" cx="130" cy="200" r="5" class="body-part ${painPoints['right-hand'] ? 'pain-point' : ''}"></circle>
+                            <circle id="left-foot" cx="92.5" cy="355" r="5" class="body-part ${painPoints['left-foot'] ? 'pain-point' : ''}"></circle>
+                            <circle id="right-foot" cx="107.5" cy="355" r="5" class="body-part ${painPoints['right-foot'] ? 'pain-point' : ''}"></circle>
+                        </svg>
+                    </div>
+                </main>
+            `;
+        }
+        
+        function renderFirstAidPage() {
+             const contactsHtml = emergencyContacts.length > 0 ? emergencyContacts.map((contact, index) => `
+                <div class="flex items-center justify-between p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-gray-800 dark:text-gray-200">${contact.name}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">${contact.number}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="callContact('${contact.number}')" class="p-2 text-white bg-green-500 rounded-full hover:bg-green-600 transition-colors">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                        <button onclick="removeEmergencyContact(${index})" class="p-2 text-white bg-red-500 rounded-full hover:bg-red-600 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('') : `<p class="text-center text-gray-500 dark:text-gray-400">அவசர தொடர்புகள் எதுவும் இல்லை.</p>`;
+            
+            return `
+                ${renderHeader()}
+                <main class="w-full max-w-4xl p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-red-600 dark:text-red-400" id="feature-title">${t.firstAidEmergencyLabel}</h2>
+                        <button onclick="navigateTo('features')" class="p-2 px-4 rounded-full text-sm font-bold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            ${t.backToFeatures}
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 bg-red-100 dark:bg-red-900 rounded-2xl shadow-lg mb-6">
+                        <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-4">${t.firstAidEmergencyTitle}</h3>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">${t.firstAidDescription}</p>
+                        <div class="space-y-4">
+                            <input type="text" id="contactName" placeholder="${t.contactNamePlaceholder}" class="w-full p-3 rounded-lg border border-red-300 dark:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <input type="tel" id="contactNumber" placeholder="${t.contactNumberPlaceholder}" class="w-full p-3 rounded-lg border border-red-300 dark:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-700 dark:text-gray-100">
+                            <button onclick="addEmergencyContact()" class="w-full p-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors shadow-md">
+                                ${t.addContactBtn}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-red-600 dark:text-red-400 mb-4">${t.emergencyContactsTitle}</h3>
+                    <div class="space-y-4">
+                        ${contactsHtml}
+                    </div>
+                </main>
+            `;
+        }
+        
+        function navigateTo(page) {
+            currentPage = page;
             renderPage();
-        };
+            // Reset search output for AI pages
+            if (['localTips', 'mealPlan', 'exerciseYoga', 'diseasePrevention', 'wellnessChallenges', 'symptomChecker'].includes(page)) {
+                aiTipOutput = '';
+            }
+        }
 
+        function renderPage() {
+            const app = document.getElementById('app');
+            let content = '';
+            
+            switch(currentPage) {
+                case 'login':
+                    content = renderLoginPage();
+                    break;
+                case 'main':
+                    content = renderMainPage();
+                    break;
+                case 'features':
+                    content = renderFeaturesPage();
+                    break;
+                case 'foodRecipes':
+                    content = renderFoodRecipesPage();
+                    break;
+                case 'stepTracker':
+                    content = renderTrackerPage(
+                        t.stepSectionTitle,
+                        steps,
+                        'படிகள்',
+                        t.startTrackingBtn,
+                        t.stopTrackingBtn,
+                        t.resetStepsBtn,
+                        t.stepTipOutputDefault,
+                        'startStepTracking()',
+                        'stopStepTracking()',
+                        'resetSteps()'
+                    );
+                    break;
+                case 'heartRate':
+                    content = renderTrackerPage(
+                        t.heartRateSectionTitle,
+                        heartRate > 0 ? heartRate : t.heartRateResultOutputDefault,
+                        'BPM',
+                        t.startMeasuringBtn,
+                        t.stopMeasuringBtn,
+                        t.resetHeartRateBtn,
+                        t.heartRateTipOutputDefault,
+                        'startHeartRateMeasuring()',
+                        'stopHeartRateMeasuring()',
+                        'resetHeartRate()'
+                    );
+                    break;
+                case 'waterTracker':
+                    content = renderWaterTrackerPage();
+                    break;
+                case 'journal':
+                    content = renderJournalPage();
+                    break;
+                case 'medicationReminder':
+                    content = renderMedicationReminderPage();
+                    break;
+                case 'bodyPainMap':
+                    content = renderBodyPainMapPage();
+                    break;
+                case 'firstAid':
+                    content = renderFirstAidPage();
+                    break;
+                case 'localTips':
+                    content = renderAiTipPage(t.localTipsLabel, 'orange');
+                    break;
+                case 'mealPlan':
+                    content = renderAiTipPage(t.mealPlanLabel, 'teal');
+                    break;
+                case 'exerciseYoga':
+                    content = renderAiTipPage(t.exerciseYogaLabel, 'pink');
+                    break;
+                case 'diseasePrevention':
+                    content = renderAiTipPage(t.diseasePreventionLabel, 'cyan');
+                    break;
+                case 'wellnessChallenges':
+                    content = renderAiTipPage(t.wellnessChallengeLabel, 'lime');
+                    break;
+                case 'symptomChecker':
+                    content = renderAiTipPage(t.symptomCheckerLabel, 'emerald');
+                    break;
+            }
+            app.innerHTML = content.replace(/{{t\.([^}]+)}}/g, (match, key) => t[key] || match);
+        }
+
+        // Initial render
+        renderPage();
+        
     </script>
-
 </body>
 </html>
