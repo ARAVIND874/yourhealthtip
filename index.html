@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ஆரோக்கிய நண்பன்</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></link>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-slow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+
+    <div id="app" class="flex flex-col items-center p-8">
+        <!-- App content will be rendered here by JavaScript -->
+    </div>
+
+    <!-- Custom Modal -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center hidden">
+        <div class="relative p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-sm w-full mx-4 sm:mx-auto">
+            <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+            <p id="modal-message" class="text-gray-700 dark:text-gray-300"></p>
+            <div class="mt-6 text-right">
+                <button onclick="closeModal()" class="p-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    சரி
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Translations object
+        const translations = {
+            ta: {
+                loginTitle: 'ஆரோக்கிய நண்பனுக்கு வரவேற்கிறோம்',
+                loginDescription: 'தொடர உள்நுழையவும் அல்லது பதிவு செய்யவும்.',
+                emailPlaceholder: 'மின்னஞ்சல்',
+                passwordPlaceholder: 'கடவுச்சொல்',
+                loginBtn: 'உள்நுழை',
+                registerBtn: 'பதிவு செய்',
+                logoutBtn: 'வெளியேறு',
+                mainTitle: 'ஆரோக்கிய நண்பன் - உங்கள் ஆரோக்கிய வழிகாட்டி',
+                featuresDescription: 'உங்கள் ஆரோக்கியம் மற்றும் நல்வாழ்வை நிர்வகிக்க அனைத்து அம்சங்களையும் ஆராயுங்கள்.',
+                generalHealthTipLabel: 'பொது ஆரோக்கிய குறிப்பு',
+                tipSectionTitle: 'ஆரோக்கிய குறிப்பு பெறுங்கள்',
+                descriptionText: 'உங்கள் ஆரோக்கிய இலக்கை உள்ளிட்டு தனிப்பயனாக்கப்பட்ட குறிப்புகளைப் பெறுங்கள்!',
+                generateBtn: 'குறிப்பு பெறு',
+                loadingText: 'குறிப்பு உருவாக்கப்படுகிறது...',
+                featuresTitle: 'மேலும் அம்சங்களை ஆராயுங்கள்',
+                showFeaturesLabel: 'அம்சங்கள்',
+                backToMain: 'முக்கிய பக்கத்திற்கு திரும்பு',
+                backToFeatures: 'அம்சங்களுக்கு திரும்பு',
+                featuresPageTitle: 'அனைத்து ஆரோக்கிய அம்சங்கள்',
+                foodRecipesLabel: 'உணவு செய்முறைகள்',
+                stepTrackerLabel: 'படி கண்காணிப்பு',
+                heartRateTrackerLabel: 'இதயத் துடிப்பு',
+                waterTrackerLabel: 'நீர் உட்கொள்ளல்',
+                journalLabel: 'மனநிலை நாட்குறிப்பு',
+                localTipsLabel: 'உள்ளூர் குறிப்புகள்',
+                mealPlanLabel: 'உணவுத் திட்டம்',
+                exerciseYogaLabel: 'உடற்பயிற்சி & யோகா',
+                moodAnalysisLabel: 'மனநிலை பகுப்பாய்வு',
+                diseasePreventionLabel: 'நோய் தடுப்பு',
+                wellnessChallengeLabel: 'ஆரோக்கிய சவால்கள்',
+                medicationReminderLabel: 'மருந்து நினைவூட்டல்',
+                bodyPainMappingLabel: 'உடல் வலி வரைபடம்',
+                firstAidEmergencyLabel: 'முதலுதவி & அவசரம்',
+                symptomCheckerLabel: 'அறிகுறி சரிபார்ப்பு',
+
+                // Food Recipes
+                foodRecipesTitle: 'உணவு செய்முறைகள்',
+                foodRecipesDescription: 'ஒரு உணவின் பெயர் அல்லது மூலப்பொருட்களை உள்ளிட்டு செய்முறையைப் பெறுங்கள்.',
+                foodSearchPlaceholder: 'தேடல் செய்முறைகள்...',
+                foodSearchBtn: 'தேடு',
+                foodLoadingText: 'செய்முறை தேடப்படுகிறது...',
+                noRecipesFound: 'செய்முறை எதுவும் கிடைக்கவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                ingredientsLabel: 'தேவையான பொருட்கள்',
+                instructionsLabel: 'செய்முறை',
+                
+                // Search box
+                searchPlaceholder: 'உங்கள் சந்தேகத்தை இங்கே உள்ளிடவும்...',
+                searchLoading: 'உதவிக்குறிப்பு தேடப்படுகிறது...',
+                searchBtn: 'தேடு',
+
+                // Step Tracker
+                stepSectionTitle: 'படி கண்காணிப்பு',
+                startTrackingBtn: 'கண்காணிப்பை தொடங்கு',
+                stopTrackingBtn: 'கண்காணிப்பை நிறுத்து',
+                resetStepsBtn: 'படிகளை மீட்டமை',
+                stepResultOutputDefault: 'உங்கள் தினசரி படிகளை இங்கே கண்காணிக்கவும்!',
+                stepTipOutputDefault: 'ஒரு நாளைக்கு 10,000 படிகள் நடப்பது உங்கள் ஆரோக்கியத்தை கணிசமாக மேம்படுத்தும்.',
+
+                // Heart Rate Tracker
+                heartRateSectionTitle: 'இதயத் துடிப்பு கண்காணிப்பு',
+                startMeasuringBtn: 'துடிப்பை அளக்க தொடங்கு',
+                stopMeasuringBtn: 'அளப்பதை நிறுத்து',
+                resetHeartRateBtn: 'இதயத் துடிப்பை மீட்டமை',
+                heartRateResultOutputDefault: 'சிறந்த ஆரோக்கியத்திற்காக உங்கள் இதயத் துடிப்பை கண்காணிக்கவும்.',
+                heartRateTipOutputDefault: 'ஓய்வு நேரத்தில் இதயத் துடிப்பு 60-100 BPM பொதுவாக பெரியவர்களுக்கு சாதாரணமாகக் கருதப்படுகிறது.',
+
+                // Water Tracker
+                waterSectionTitle: 'நீர் உட்கொள்ளல் கண்காணிப்பு',
+                addWaterBtn: '250 மிலி சேர்',
+                resetWaterBtn: 'நீரை மீட்டமை',
+                waterResultOutputDefault: 'உங்கள் தினசரி நீர் உட்கொள்ளலை கண்காணிக்கவும்.',
+                waterTipOutputDefault: 'சரியான நீரேற்றத்திற்கு ஒரு நாளைக்கு குறைந்தது 8 கிளாஸ் தண்ணீர் குடிக்கவும்.',
+                waterIntakeTitle: 'நீர் உட்கொள்ளல்',
+
+                // Journal
+                journalSectionTitle: 'மனநிலை & நன்றியுணர்வு நாட்குறிப்பு',
+                journalDescription: 'உங்கள் மனநிலையையும், நீங்கள் நன்றியுள்ள விஷயங்களையும் தினமும் பதிவு செய்யுங்கள்.',
+                saveJournalEntryBtn: 'பதிவை சேமி',
+                journalEntriesOutputDefault: 'உங்கள் நாட்குறிப்பு பதிவுகள் இங்கே தோன்றும்.',
+                analyzeMoodJournalBtn: 'மனநிலையை பகுப்பாய்வு செய்',
+                moodAnalysisOutputDefault: 'உங்கள் மனநிலை பகுப்பாய்வு இங்கே தோன்றும்.',
+
+                // General page
+                generalPageDefault: 'இந்த அம்சம் இன்னும் உருவாக்கப்படவில்லை. எதிர்காலத்தில் சேர்க்கப்படும்!',
+
+                // Modals & Alerts
+                modalSuccessTitle: 'வெற்றி!',
+                modalErrorTitle: 'பிழை!',
+                modalSaveSuccess: 'உங்கள் தரவு வெற்றிகரமாக சேமிக்கப்பட்டது!',
+                modalSaveError: 'தரவைச் சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                modalMedicineAdded: 'மருந்து வெற்றிகரமாக சேர்க்கப்பட்டது!',
+                modalMedicineRemoved: 'மருந்து வெற்றிகரமாக அகற்றப்பட்டது!',
+                modalMedicineError: 'மருந்து சேர்க்க முடியவில்லை. அனைத்து புலங்களையும் நிரப்பவும்.',
+                modalAuthError: 'அங்கீகாரம் தோல்வியடைந்தது. பக்கத்தை புதுப்பிக்கவும்.',
+                modalJournalSaved: 'நாட்குறிப்பு பதிவு சேமிக்கப்பட்டது!',
+                modalJournalError: 'நாட்குறிப்பு பதிவைச் சேமிக்க முடியவில்லை.',
+                modalPainPointSaved: 'வலி புள்ளி சேமிக்கப்பட்டது!',
+                modalPainPointRemoved: 'வலி புள்ளி அகற்றப்பட்டது!',
+                modalPainPointError: 'வலி புள்ளியைச் சேமிக்க முடியவில்லை. தயவுசெய்து ஒரு விளக்கத்தை வழங்கவும்.',
+                modalContactAdded: 'அவசர தொடர்பு சேர்க்கப்பட்டது!',
+                modalContactRemoved: 'அவசர தொடர்பு அகற்றப்பட்டது!',
+                modalContactError: 'தொடர்பைச் சேர்க்க முடியவில்லை. அனைத்து புலங்களையும் நிரப்பவும்.',
+                alarmModalTitle: 'மருந்து நினைவூட்டல்!',
+                alarmModalMessage: 'உங்கள் மருந்தை எடுத்துக்கொள்ள வேண்டிய நேரம்: ',
+                alarmModalDismissBtn: 'நீக்கு',
+                speechRecognitionError: 'பேச்சு அங்கீகாரம் ஆதரிக்கப்படவில்லை அல்லது அனுமதி மறுக்கப்பட்டது.',
+                speechRecognitionNoMatch: 'ஆடியோவை புரிந்து கொள்ள முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                speechRecognitionListening: 'கேட்கிறது...',
+                speechRecognitionProcessing: 'ஆடியோ செயலாக்கப்படுகிறது...',
+                ttsError: 'ஆடியோவை உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                ttsSpeaking: 'பேசுகிறது...',
+                ttsLoadingVoices: 'குரல்கள் ஏற்றப்படுகிறது...',
+                ttsNoVoices: 'இந்த மொழிக்கு குரல்கள் கிடைக்கவில்லை.',
+                aiTipTitle: 'AI உதவிக்குறிப்பு',
+                aiTipPlaceholder: 'உங்கள் குறிப்பு இங்கே தோன்றும்.',
+                selectLanguage: 'மொழித் தேர்வு',
+            },
+            en: {
+                loginTitle: 'Welcome to Health Buddy',
+                loginDescription: 'Please login or register to continue.',
+                emailPlaceholder: 'Email',
+                passwordPlaceholder: 'Password',
+                loginBtn: 'Login',
+                registerBtn: 'Register',
+                logoutBtn: 'Logout',
+                mainTitle: 'Health Buddy - Your Health Guide',
+                featuresDescription: 'Explore all the features to manage your health and well-being.',
+                generalHealthTipLabel: 'General Health Tip',
+                tipSectionTitle: 'Get a Health Tip',
+                descriptionText: 'Enter your health goal and get personalized tips!',
+                generateBtn: 'Get Tip',
+                loadingText: 'Generating tip...',
+                featuresTitle: 'Explore More Features',
+                showFeaturesLabel: 'Features',
+                backToMain: 'Back to Main',
+                backToFeatures: 'Back to Features',
+                featuresPageTitle: 'All Health Features',
+                foodRecipesLabel: 'Food Recipes',
+                stepTrackerLabel: 'Step Tracker',
+                heartRateTrackerLabel: 'Heart Rate',
+                waterTrackerLabel: 'Water Intake',
+                journalLabel: 'Mood Journal',
+                localTipsLabel: 'Local Tips',
+                mealPlanLabel: 'Meal Plan',
+                exerciseYogaLabel: 'Exercise & Yoga',
+                moodAnalysisLabel: 'Mood Analysis',
+                diseasePreventionLabel: 'Disease Prevention',
+                wellnessChallengeLabel: 'Wellness Challenges',
+                medicationReminderLabel: 'Medication Reminder',
+                bodyPainMappingLabel: 'Body Pain Map',
+                firstAidEmergencyLabel: 'First Aid & Emergency',
+                symptomCheckerLabel: 'Symptom Checker',
+
+                // Food Recipes
+                foodRecipesTitle: 'Food Recipes',
+                foodRecipesDescription: 'Enter a food name or ingredients to get a recipe.',
+                foodSearchPlaceholder: 'Search recipes...',
+                foodSearchBtn: 'Search',
+                foodLoadingText: 'Searching for recipe...',
+                noRecipesFound: 'No recipes found. Please try again.',
+                ingredientsLabel: 'Ingredients',
+                instructionsLabel: 'Instructions',
+                
+                // Search box
+                searchPlaceholder: 'Enter your query here...',
+                searchLoading: 'Searching for a tip...',
+                searchBtn: 'Search',
+
+                // Step Tracker
+                stepSectionTitle: 'Step Tracker',
+                startTrackingBtn: 'Start Tracking',
+                stopTrackingBtn: 'Stop Tracking',
+                resetStepsBtn: 'Reset Steps',
+                stepResultOutputDefault: 'Track your daily steps here!',
+                stepTipOutputDefault: 'Walking 10,000 steps a day can significantly improve your health.',
+
+                // Heart Rate Tracker
+                heartRateSectionTitle: 'Heart Rate Tracker',
+                startMeasuringBtn: 'Start Measuring',
+                stopMeasuringBtn: 'Stop Measuring',
+                resetHeartRateBtn: 'Reset Heart Rate',
+                heartRateResultOutputDefault: 'Track your heart rate for better health.',
+                heartRateTipOutputDefault: 'A resting heart rate of 60-100 BPM is generally considered normal for adults.',
+
+                // Water Tracker
+                waterSectionTitle: 'Water Intake Tracker',
+                addWaterBtn: 'Add 250 ml',
+                resetWaterBtn: 'Reset Water',
+                waterResultOutputDefault: 'Track your daily water intake.',
+                waterTipOutputDefault: 'Drink at least 8 glasses of water a day for proper hydration.',
+                waterIntakeTitle: 'Water Intake',
+
+                // Journal
+                journalSectionTitle: 'Mood & Gratitude Journal',
+                journalDescription: 'Record your mood and what you are grateful for each day.',
+                saveJournalEntryBtn: 'Save Entry',
+                journalEntriesOutputDefault: 'Your journal entries will appear here.',
+                analyzeMoodJournalBtn: 'Analyze Mood',
+                moodAnalysisOutputDefault: 'Your mood analysis will appear here.',
+
+                // General page
+                generalPageDefault: 'This feature is not yet developed. It will be added in the future!',
+
+                // Modals & Alerts
+                modalSuccessTitle: 'Success!',
+                modalErrorTitle: 'Error!',
+                modalSaveSuccess: 'Your data has been saved successfully!',
+                modalSaveError: 'Failed to save data. Please try again.',
+                modalMedicineAdded: 'Medicine added successfully!',
+                modalMedicineRemoved: 'Medicine removed successfully!',
+                modalMedicineError: 'Failed to add medicine. Please fill all fields.',
+                modalAuthError: 'Authentication failed. Please refresh the page.',
+                modalJournalSaved: 'Journal entry saved!',
+                modalJournalError: 'Failed to save journal entry.',
+                modalPainPointSaved: 'Pain point saved!',
+                modalPainPointRemoved: 'Pain point removed!',
+                modalPainPointError: 'Failed to save pain point. Please provide a description.',
+                modalContactAdded: 'Emergency contact added!',
+                modalContactRemoved: 'Emergency contact removed!',
+                modalContactError: 'Failed to add contact. Please fill all fields.',
+                alarmModalTitle: 'Medication Reminder!',
+                alarmModalMessage: 'It\'s time to take your medicine: ',
+                alarmModalDismissBtn: 'Dismiss',
+                speechRecognitionError: 'Speech recognition is not supported or permission was denied.',
+                speechRecognitionNoMatch: 'Could not understand the audio. Please try again.',
+                speechRecognitionListening: 'Listening...',
+                speechRecognitionProcessing: 'Processing audio...',
+                ttsError: 'Failed to generate audio. Please try again.',
+                ttsSpeaking: 'Speaking...',
+                ttsLoadingVoices: 'Loading voices...',
+                ttsNoVoices: 'No voices available for this language.',
+                aiTipTitle: 'AI Tip',
+                aiTipPlaceholder: 'Your tip will appear here.',
+                selectLanguage: 'Select Language',
+            },
+        };
+
+        let currentLang = 'ta';
+        let t = translations[currentLang];
+        let isAuthenticated = false;
+        let currentPage = 'login';
+        
+        // State variables for the app
+        let steps = 0;
+        let isStepTracking = false;
+        let stepInterval = null;
+
+        let heartRate = 0;
+        let isHeartRateMeasuring = false;
+        let heartRateInterval = null;
+        
+        let waterIntake = 0;
+        let journalEntry = '';
+        let journalEntries = [];
+        let moodAnalysis = '';
+        let healthTipInput = '';
+        let healthTipOutput = '';
+        let isLoading = false;
+        let isSearchLoading = false;
+        let aiTipOutput = '';
+        let foodRecipeQuery = '';
+        let foodRecipes = [];
+        let isFoodLoading = false;
+
+        // Speech API
+        let isListening = false;
+        let isSpeaking = false;
+        let recognition;
+        
+        const apiKey = ""; // API key is automatically provided at runtime
+
+        // Helper functions
+        const pcmToWav = (pcmData, sampleRate) => {
+            const buffer = new ArrayBuffer(44 + pcmData.byteLength);
+            const view = new DataView(buffer);
+            const writeString = (view, offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.byteLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // PCM
+            view.setUint16(22, 1, true); // Mono
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true); // Bytes per second
+            view.setUint16(32, 2, true); // Block align
+            view.setUint16(34, 16, true); // Bits per sample
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.byteLength, true);
+            new Int16Array(buffer, 44).set(pcmData);
+            return new Blob([buffer], { type: 'audio/wav' });
+        };
+
+        const base64ToArrayBuffer = (base64) => {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        };
+
+        // Modal functions
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
+        }
+
+        // API call with exponential backoff
+        async function callApiWithBackoff(apiCall, maxRetries = 5, delay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const result = await apiCall();
+                    return result;
+                } catch (error) {
+                    if (i < maxRetries - 1) {
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        // Language switching
+        function switchLanguage(lang) {
+            currentLang = lang;
+            t = translations[currentLang];
+            renderPage();
+        }
+
+        // Function to generate a health tip using the Gemini API
+        async function generateHealthTip() {
+            const input = document.getElementById('healthTipInput').value;
+            if (!input.trim()) {
+                showModal(t.modalErrorTitle, "தயவுசெய்து உங்கள் ஆரோக்கிய இலக்கை உள்ளிடவும்.");
+                return;
+            }
+            isLoading = true;
+            renderPage();
+
+            try {
+                // Determine the language for the prompt
+                const langName = currentLang === 'ta' ? 'தமிழ்' : 'English';
+                const prompt = `User's health goal: "${input}". Based on this goal, generate a short, useful, personalized health tip in ${langName}. The tip should be under 50 words.`;
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+
+                const apiCall = async () => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                };
+                
+                const result = await callApiWithBackoff(apiCall);
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    healthTipOutput = result.candidates[0].content.parts[0].text;
+                } else {
+                    healthTipOutput = 'குறிப்பு உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+                }
+            } catch (error) {
+                console.error("API error:", error);
+                healthTipOutput = 'குறிப்பு உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+            } finally {
+                isLoading = false;
+                renderPage();
+            }
+        }
+        
+        async function getFoodRecipes() {
+            const query = document.getElementById('foodRecipeInput').value;
+            if (!query.trim()) {
+                showModal(t.modalErrorTitle, "தயவுசெய்து செய்முறையை உள்ளிடவும்.");
+                return;
+            }
+            isFoodLoading = true;
+            renderPage();
+            foodRecipes = []; // Clear previous recipes
+
+            try {
+                const prompt = `செய்முறையின் பெயர் "${query}" அல்லது அதில் உள்ள பொருட்கள் "${query}"-ஐ அடிப்படையாகக் கொண்டு, தமிழில் 3 உணவு செய்முறைகளைக் கண்டறிந்து, ஒவ்வொரு செய்முறைக்கும் தேவையான பொருட்கள் மற்றும் செய்முறை வழிமுறைகளுடன் ஒரு JSON கட்டமைப்பில் உள்ளீட்டை வழங்கவும். JSON கட்டமைப்பு பின்வருமாறு இருக்க வேண்டும்: Array of Objects, ஒவ்வொரு பொருளுக்கும் "recipeName", "ingredients" (Array of Strings), மற்றும் "instructions" (Array of Strings).`;
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { 
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    "recipeName": { "type": "STRING" },
+                                    "ingredients": {
+                                        "type": "ARRAY",
+                                        "items": { "type": "STRING" }
+                                    },
+                                    "instructions": {
+                                        "type": "ARRAY",
+                                        "items": { "type": "STRING" }
+                                    }
+                                },
+                            }
+                        }
+                    }
+                };
+
+                const apiCall = async () => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                };
+                
+                const result = await callApiWithBackoff(apiCall);
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const json = result.candidates[0].content.parts[0].text;
+                    foodRecipes = JSON.parse(json);
+                } else {
+                    foodRecipes = [];
+                    showModal(t.modalErrorTitle, t.noRecipesFound);
+                }
+            } catch (error) {
+                console.error("API error:", error);
+                foodRecipes = [];
+                showModal(t.modalErrorTitle, t.noRecipesFound);
+            } finally {
+                isFoodLoading = false;
+                renderPage();
+            }
+        }
+
+
+        async function getAiTipForQuery(query, featureName) {
+            if (!query.trim()) {
+                showModal(t.modalErrorTitle, "தயவுசெய்து உங்கள் சந்தேகத்தை உள்ளிடவும்.");
+                return;
+            }
+            isSearchLoading = true;
+            renderPage();
+
+            try {
+                const prompt = `"${featureName}" என்ற தலைப்பில் உள்ள பயனர் சந்தேகம்: "${query}". இந்த சந்தேகத்திற்கு தமிழில் ஒரு விரிவான, பயனுள்ள குறிப்பை வழங்குங்கள்.`;
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                
+                const apiCall = async () => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                };
+                
+                const result = await callApiWithBackoff(apiCall);
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    aiTipOutput = result.candidates[0].content.parts[0].text;
+                } else {
+                    aiTipOutput = 'உதவிக்குறிப்பு உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+                }
+            } catch (error) {
+                console.error("API error:", error);
+                aiTipOutput = 'உதவிக்குறிப்பு உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+            } finally {
+                isSearchLoading = false;
+                renderPage();
+            }
+        }
+
+        // Function to analyze mood
+        async function analyzeMood() {
+            if (journalEntries.length === 0) {
+                showModal(t.modalErrorTitle, "பகுப்பாய்வு செய்ய நாட்குறிப்பு பதிவுகள் இல்லை.");
+                return;
+            }
+            isLoading = true;
+            renderPage();
+
+            try {
+                const prompt = `இந்த நாட்குறிப்பு பதிவுகளை பகுப்பாய்வு செய்து, பயனரின் ஒட்டுமொத்த மனநிலை போக்கைப் பற்றி தமிழில் ஒரு சுருக்கமான, ஆதரவான சுருக்கத்தை வழங்கவும். முடிந்தால் நேர்மறை, எதிர்மறை அல்லது நடுநிலை மனநிலைகளை அடையாளம் காணவும். பதிவுகள்: ${journalEntries.map(e => e.entry).join('; ')}`;
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiCall = async () => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                };
+                
+                const result = await callApiWithBackoff(apiCall);
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    moodAnalysis = result.candidates[0].content.parts[0].text;
+                } else {
+                    moodAnalysis = 'மனநிலை பகுப்பாய்வு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+                }
+            } catch (error) {
+                console.error("API error:", error);
+                moodAnalysis = 'மனநிலை பகுப்பாய்வு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+            } finally {
+                isLoading = false;
+                renderPage();
+            }
+        }
+
+        // Speech Recognition handlers
+        function startListening(inputElementId) {
+            if (recognition) {
+                recognition.start();
+                isListening = true;
+                renderPage();
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById(inputElementId).value = transcript;
+                    // Update state if necessary
+                    if (inputElementId === 'healthTipInput') healthTipInput = transcript;
+                    if (inputElementId === 'journalEntryInput') journalEntry = transcript;
+                    if (inputElementId === 'foodRecipeInput') foodRecipeQuery = transcript;
+                    if (inputElementId.startsWith('searchQuery')) {
+                        const featureName = document.getElementById('feature-title').textContent;
+                        getAiTipForQuery(transcript, featureName);
+                    }
+                };
+
+            } else {
+                showModal(t.modalErrorTitle, t.speechRecognitionError);
+            }
+        }
+
+        // TTS handlers
+        async function speakText(text) {
+            if (isSpeaking) {
+                return;
+            }
+            isSpeaking = true;
+            renderPage();
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: "Algieba" }
+                            }
+                        }
+                    },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+
+                const apiCall = async () => {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error('API request failed');
+                    return response.json();
+                };
+                
+                const apiResponse = await callApiWithBackoff(apiCall);
+                const part = apiResponse?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.onended = () => {
+                        isSpeaking = false;
+                        renderPage();
+                    };
+                    audio.play();
+                } else {
+                    throw new Error('No audio data or invalid mime type in API response.');
+                }
+            } catch (error) {
+                console.error('TTS API error:', error);
+                showModal(t.modalErrorTitle, t.ttsError);
+                isSpeaking = false;
+                renderPage();
+            }
+        }
+
+        // Event handler for feature clicks
+        function handleFeatureClick(feature) {
+             navigateToPage(feature);
+        }
+        
+        function navigateToPage(pageName) {
+            // Clear any active intervals or state before navigating
+            if (isStepTracking) stopAutoStepTracking();
+            if (isHeartRateMeasuring) stopHeartRateMeasuring();
+            aiTipOutput = ''; // Clear AI tip on page change
+            currentPage = pageName;
+            renderPage();
+        }
+
+        // Automatic Step Tracker
+        function toggleStepTracking() {
+            if (isStepTracking) {
+                stopAutoStepTracking();
+            } else {
+                startAutoStepTracking();
+            }
+        }
+        function startAutoStepTracking() {
+            isStepTracking = true;
+            // Simulate a more realistic human walking pace (e.g., 120 steps/min)
+            stepInterval = setInterval(() => {
+                steps += 1; // Increment by 1 step every half-second
+                renderPage();
+            }, 500);
+            renderPage();
+        }
+        function stopAutoStepTracking() {
+            isStepTracking = false;
+            clearInterval(stepInterval);
+            renderPage();
+        }
+        function resetSteps() {
+            stopAutoStepTracking();
+            steps = 0;
+            renderPage();
+        }
+
+        // Automatic Heart Rate Measuring
+        function toggleHeartRateMeasuring() {
+            if (isHeartRateMeasuring) {
+                stopHeartRateMeasuring();
+            } else {
+                startHeartRateMeasuring();
+            }
+        }
+        function startHeartRateMeasuring() {
+            isHeartRateMeasuring = true;
+            heartRateInterval = setInterval(() => {
+                heartRate = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
+                renderPage();
+            }, 2000);
+            renderPage();
+        }
+        function stopHeartRateMeasuring() {
+            isHeartRateMeasuring = false;
+            clearInterval(heartRateInterval);
+            heartRate = 0; // Reset heart rate when stopping
+            renderPage();
+        }
+        function resetHeartRate() {
+            stopHeartRateMeasuring();
+            heartRate = 0;
+            renderPage();
+        }
+        
+        // Reusable search component
+        function renderSearchAndTipSection(featureName) {
+            const searchInputId = `searchQuery-${currentPage}`;
+            return `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                        <input
+                            id="${searchInputId}"
+                            type="text"
+                            placeholder="${t.searchPlaceholder}"
+                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button id="micBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                        </button>
+                        <button
+                            id="searchBtn"
+                            class="p-3 text-white font-bold rounded-lg transition-colors ${isSearchLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
+                            ${isSearchLoading ? 'disabled' : ''}
+                        >
+                            ${t.searchBtn}
+                        </button>
+                    </div>
+                    ${aiTipOutput ? `
+                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-start">
+                        <h3 class="font-semibold text-lg mb-2">${t.aiTipTitle}</h3>
+                        <p class="flex-grow">${aiTipOutput}</p>
+                        <button id="speakTipBtn" class="ml-4 p-2 rounded-full text-white transition-colors ${isSpeaking ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Function to render a general feature page with search
+        function renderFeaturePage(title, contentHtml, onBackClick, actionsHtml = '') {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="w-full max-w-2xl">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 id="feature-title" class="text-3xl font-bold">${title}</h1>
+                        <button id="backToFeaturesBtn" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i> ${t.backToFeatures}
+                        </button>
+                    </div>
+                    
+                    ${contentHtml}
+
+                    <div class="flex flex-wrap justify-center gap-4 mt-6">
+                        ${actionsHtml}
+                    </div>
+
+                    ${renderSearchAndTipSection(title)}
+                </div>
+            `;
+            document.getElementById('backToFeaturesBtn').onclick = onBackClick;
+            document.getElementById('searchBtn').onclick = () => {
+                const query = document.getElementById(`searchQuery-${currentPage}`).value;
+                getAiTipForQuery(query, title);
+            };
+            document.getElementById('micBtn').onclick = () => startListening(`searchQuery-${currentPage}`);
+            if (aiTipOutput) {
+                 document.getElementById('speakTipBtn').onclick = () => speakText(aiTipOutput);
+            }
+        }
+        
+
+        // Rendering functions for each page
+        function renderLoginPage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-screen w-full">
+                    <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-sm">
+                        <h1 class="text-3xl font-bold mb-4 text-center">${t.loginTitle}</h1>
+                        <p class="text-center mb-6">${t.loginDescription}</p>
+                        <div class="space-y-4">
+                            <input
+                                type="email"
+                                placeholder="${t.emailPlaceholder}"
+                                class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <input
+                                type="password"
+                                placeholder="${t.passwordPlaceholder}"
+                                class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                                id="loginBtn"
+                                class="w-full p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors"
+                            >
+                                ${t.loginBtn}
+                            </button>
+                            <button
+                                id="registerBtn"
+                                class="w-full p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                ${t.registerBtn}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('loginBtn').onclick = () => { isAuthenticated = true; navigateToPage('main'); };
+            document.getElementById('registerBtn').onclick = () => showModal(t.modalSuccessTitle, t.modalSaveSuccess);
+        }
+
+        function renderMainPage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="w-full max-w-4xl">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-4xl font-bold">${t.mainTitle}</h1>
+                        <div class="flex space-x-2">
+                             <div class="relative inline-block text-left">
+                                <select id="language-switcher" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                                    <option value="ta" ${currentLang === 'ta' ? 'selected' : ''}>தமிழ்</option>
+                                    <option value="en" ${currentLang === 'en' ? 'selected' : ''}>English</option>
+                                </select>
+                             </div>
+                            <button id="showFeaturesBtn" class="bg-green-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                <i class="fas fa-list-ul mr-2"></i> ${t.showFeaturesLabel}
+                            </button>
+                            <button id="logoutBtn" class="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i> ${t.logoutBtn}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+                        <h2 class="text-2xl font-bold mb-4">${t.tipSectionTitle}</h2>
+                        <p class="mb-4">${t.descriptionText}</p>
+                        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                            <input
+                                id="healthTipInput"
+                                type="text"
+                                value="${healthTipInput}"
+                                placeholder="${t.generalHealthTipLabel}"
+                                class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button id="startListeningBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                                <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                            </button>
+                        </div>
+                        <button
+                            id="generateBtn"
+                            class="w-full p-3 text-white font-bold rounded-lg transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
+                            ${isLoading ? 'disabled' : ''}
+                        >
+                            ${isLoading ? t.loadingText : t.generateBtn}
+                        </button>
+                        ${healthTipOutput ? `
+                        <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-start">
+                            <p class="flex-grow">${healthTipOutput}</p>
+                            <button id="speakBtn" class="ml-4 p-2 rounded-full text-white transition-colors ${isSpeaking ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            document.getElementById('language-switcher').onchange = (e) => {
+                switchLanguage(e.target.value);
+                // When language changes, clear previous AI tip so it re-generates in the new language
+                healthTipOutput = '';
+                renderPage();
+            };
+            document.getElementById('showFeaturesBtn').onclick = () => navigateToPage('features');
+            document.getElementById('logoutBtn').onclick = () => { isAuthenticated = false; navigateToPage('login'); };
+            document.getElementById('generateBtn').onclick = generateHealthTip;
+            document.getElementById('startListeningBtn').onclick = () => startListening('healthTipInput');
+            if (healthTipOutput) {
+                 document.getElementById('speakBtn').onclick = () => speakText(healthTipOutput);
+            }
+            document.getElementById('healthTipInput').oninput = (e) => { healthTipInput = e.target.value; };
+        }
+
+        function renderFeaturesPage() {
+            const app = document.getElementById('app');
+            const featureCards = [
+                { label: t.foodRecipesLabel, icon: "fas fa-utensils", page: 'foodRecipes' },
+                { label: t.stepTrackerLabel, icon: "fas fa-walking", page: 'stepTracker' },
+                { label: t.heartRateTrackerLabel, icon: "fas fa-heartbeat", page: 'heartRateTracker' },
+                { label: t.waterTrackerLabel, icon: "fas fa-tint", page: 'waterTracker' },
+                { label: t.journalLabel, icon: "fas fa-book", page: 'journal' },
+                { label: t.moodAnalysisLabel, icon: "fas fa-grin-alt", page: 'moodAnalysis' },
+                { label: t.localTipsLabel, icon: "fas fa-map-marker-alt", page: 'localTips' },
+                { label: t.mealPlanLabel, icon: "fas fa-utensils", page: 'mealPlan' },
+                { label: t.exerciseYogaLabel, icon: "fas fa-running", page: 'exerciseYoga' },
+                { label: t.diseasePreventionLabel, icon: "fas fa-shield-alt", page: 'diseasePrevention' },
+                { label: t.wellnessChallengeLabel, icon: "fas fa-trophy", page: 'wellnessChallenge' },
+                { label: t.medicationReminderLabel, icon: "fas fa-pills", page: 'medicationReminder' },
+                { label: t.bodyPainMappingLabel, icon: "fas fa-user", page: 'bodyPainMapping' },
+                { label: t.firstAidEmergencyLabel, icon: "fas fa-ambulance", page: 'firstAidEmergency' },
+                { label: t.symptomCheckerLabel, icon: "fas fa-stethoscope", page: 'symptomChecker' },
+            ];
+
+            const featureHtml = featureCards.map(card => `
+                <div
+                    id="card-${card.page}"
+                    class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                    <i class="${card.icon} text-4xl mb-4 text-blue-500"></i>
+                    <span class="font-semibold">${card.label}</span>
+                </div>
+            `).join('');
+
+            app.innerHTML = `
+                <div class="w-full max-w-4xl">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-4xl font-bold">${t.featuresPageTitle}</h1>
+                        <button id="backToMainBtn" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i> ${t.backToMain}
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        ${featureHtml}
+                    </div>
+                </div>
+            `;
+            document.getElementById('backToMainBtn').onclick = () => navigateToPage('main');
+            featureCards.forEach(card => {
+                document.getElementById(`card-${card.page}`).onclick = () => handleFeatureClick(card.page);
+            });
+        }
+        
+        function renderFoodRecipesPage() {
+            const recipeListHtml = foodRecipes.length > 0 ?
+                foodRecipes.map(recipe => `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-6">
+                        <h3 class="text-2xl font-bold text-blue-500 mb-2">${recipe.recipeName}</h3>
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-lg">${t.ingredientsLabel}</h4>
+                            <ul class="list-disc list-inside mt-2">
+                                ${recipe.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg">${t.instructionsLabel}</h4>
+                            <ol class="list-decimal list-inside mt-2">
+                                ${recipe.instructions.map(instruction => `<li>${instruction}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `).join('') :
+                `<p class="text-center text-gray-500 dark:text-gray-400">${isFoodLoading ? t.foodLoadingText : t.noRecipesFound}</p>`;
+
+            const content = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.foodRecipesDescription}</p>
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-4">
+                        <input
+                            id="foodRecipeInput"
+                            type="text"
+                            value="${foodRecipeQuery}"
+                            placeholder="${t.foodSearchPlaceholder}"
+                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button id="micBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                        </button>
+                        <button
+                            id="foodSearchBtn"
+                            class="p-3 text-white font-bold rounded-lg transition-colors ${isFoodLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}"
+                            ${isFoodLoading ? 'disabled' : ''}
+                        >
+                            ${isFoodLoading ? t.foodLoadingText : t.foodSearchBtn}
+                        </button>
+                    </div>
+                </div>
+                <div class="max-h-96 overflow-y-auto">
+                    ${recipeListHtml}
+                </div>
+            `;
+            renderFeaturePage(t.foodRecipesTitle, content, () => navigateToPage('features'));
+            document.getElementById('foodRecipeInput').oninput = (e) => { foodRecipeQuery = e.target.value; };
+            document.getElementById('foodSearchBtn').onclick = getFoodRecipes;
+            document.getElementById('micBtn').onclick = () => startListening('foodRecipeInput');
+        }
+
+        function renderStepTrackerPage() {
+            const content = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
+                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${steps}</h2>
+                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.stepTipOutputDefault}</p>
+                </div>
+            `;
+            const actions = `
+                <button id="toggleStepTrackingBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors ${isStepTracking ? 'animate-pulse-slow' : ''}">
+                    <i class="fas fa-running mr-2"></i> ${isStepTracking ? t.stopTrackingBtn : t.startTrackingBtn}
+                </button>
+                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
+                    <i class="fas fa-undo mr-2"></i> ${t.resetStepsBtn}
+                </button>
+            `;
+            renderFeaturePage(t.stepSectionTitle, content, () => navigateToPage('features'), actions);
+            document.getElementById('toggleStepTrackingBtn').onclick = toggleStepTracking;
+            document.getElementById('resetBtn').onclick = resetSteps;
+        }
+
+        function renderHeartRateTrackerPage() {
+             const content = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
+                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${heartRate || '0'}</h2>
+                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.heartRateTipOutputDefault}</p>
+                </div>
+            `;
+            const actions = `
+                <button id="toggleHeartRateMeasuringBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors ${isHeartRateMeasuring ? 'animate-pulse-slow' : ''}">
+                    <i class="fas fa-heartbeat mr-2"></i> ${isHeartRateMeasuring ? t.stopMeasuringBtn : t.startMeasuringBtn}
+                </button>
+                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
+                    <i class="fas fa-undo mr-2"></i> ${t.resetHeartRateBtn}
+                </button>
+            `;
+            renderFeaturePage(t.heartRateTrackerLabel, content, () => navigateToPage('features'), actions);
+            document.getElementById('toggleHeartRateMeasuringBtn').onclick = toggleHeartRateMeasuring;
+            document.getElementById('resetBtn').onclick = resetHeartRate;
+        }
+
+        function renderWaterTrackerPage() {
+            const content = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center">
+                    <h2 class="text-6xl font-extrabold text-blue-500 mb-4">${waterIntake} மிலி</h2>
+                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.waterTipOutputDefault}</p>
+                </div>
+            `;
+            const actions = `
+                <button id="addWaterBtn" class="p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-plus mr-2"></i> ${t.addWaterBtn}
+                </button>
+                <button id="resetBtn" class="p-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">
+                    <i class="fas fa-undo mr-2"></i> ${t.resetWaterBtn}
+                </button>
+            `;
+            renderFeaturePage(t.waterTrackerLabel, content, () => navigateToPage('features'), actions);
+            document.getElementById('addWaterBtn').onclick = () => { waterIntake += 250; renderPage(); };
+            document.getElementById('resetBtn').onclick = () => { waterIntake = 0; renderPage(); };
+        }
+
+        function renderJournalPage() {
+            const journalEntriesHtml = journalEntries.length > 0 ?
+                journalEntries.map(entry => `
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${entry.date}</p>
+                        <p class="mt-2">${entry.entry}</p>
+                    </div>
+                `).join('') :
+                `<p class="text-gray-500 dark:text-gray-400">${t.journalEntriesOutputDefault}</p>`;
+
+            const content = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+                    <p class="mb-4 text-gray-600 dark:text-gray-400 italic">${t.journalDescription}</p>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <textarea
+                            id="journalEntryInput"
+                            placeholder="${t.journalDescription}"
+                            class="flex-grow p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 h-32 resize-none"
+                        >${journalEntry}</textarea>
+                        <button id="startListeningJournalBtn" class="p-3 rounded-lg text-white font-bold transition-colors ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'}">
+                            <i class="fas ${isListening ? 'fa-microphone-slash' : 'fa-microphone'}"></i>
+                        </button>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="saveJournalBtn" class="flex-grow p-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors">
+                            ${t.saveJournalEntryBtn}
+                        </button>
+                        <button id="analyzeMoodBtn" class="flex-grow p-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors">
+                            ${t.analyzeMoodJournalBtn}
+                        </button>
+                    </div>
+                    ${moodAnalysis ? `
+                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <h3 class="font-semibold text-lg">${t.moodAnalysisLabel}</h3>
+                        <p class="mt-2">${moodAnalysis}</p>
+                    </div>
+                    ` : ''}
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold mb-4">${t.journalEntriesOutputDefault}</h3>
+                        <div class="space-y-4 max-h-60 overflow-y-auto">
+                            ${journalEntriesHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            renderFeaturePage(t.journalSectionTitle, content, () => navigateToPage('features'));
+            document.getElementById('saveJournalBtn').onclick = () => {
+                const entry = document.getElementById('journalEntryInput').value;
+                if (entry.trim()) {
+                    journalEntries.push({ entry, date: new Date().toLocaleString() });
+                    journalEntry = '';
+                    showModal(t.modalSuccessTitle, t.modalJournalSaved);
+                    renderPage();
+                } else {
+                    showModal(t.modalErrorTitle, "பதிவு காலியாக உள்ளது.");
+                }
+            };
+            document.getElementById('analyzeMoodBtn').onclick = analyzeMood;
+            document.getElementById('startListeningJournalBtn').onclick = () => startListening('journalEntryInput');
+            document.getElementById('journalEntryInput').oninput = (e) => { journalEntry = e.target.value; };
+        }
+
+        // Main rendering logic
+        function renderPage() {
+            const app = document.getElementById('app');
+            app.classList.remove('justify-center');
+            app.classList.remove('h-screen');
+
+            switch (currentPage) {
+                case 'login':
+                    app.classList.add('justify-center', 'h-screen');
+                    renderLoginPage();
+                    break;
+                case 'main':
+                    renderMainPage();
+                    break;
+                case 'features':
+                    renderFeaturesPage();
+                    break;
+                case 'foodRecipes':
+                    renderFoodRecipesPage();
+                    break;
+                case 'stepTracker':
+                    renderStepTrackerPage();
+                    break;
+                case 'heartRateTracker':
+                    renderHeartRateTrackerPage();
+                    break;
+                case 'waterTracker':
+                    renderWaterTrackerPage();
+                    break;
+                case 'journal':
+                case 'moodAnalysis':
+                     renderJournalPage();
+                     break;
+                case 'localTips':
+                     renderFeaturePage(t.localTipsLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'mealPlan':
+                     renderFeaturePage(t.mealPlanLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'exerciseYoga':
+                     renderFeaturePage(t.exerciseYogaLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'diseasePrevention':
+                     renderFeaturePage(t.diseasePreventionLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'wellnessChallenge':
+                     renderFeaturePage(t.wellnessChallengeLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'medicationReminder':
+                     renderFeaturePage(t.medicationReminderLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'bodyPainMapping':
+                     renderFeaturePage(t.bodyPainMappingLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'firstAidEmergency':
+                     renderFeaturePage(t.firstAidEmergencyLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                case 'symptomChecker':
+                     renderFeaturePage(t.symptomCheckerLabel, `<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8 text-center"><p>${t.generalPageDefault}</p></div>`, () => navigateToPage('features'));
+                     break;
+                default:
+                    renderLoginPage();
+                    break;
+            }
+        }
+        
+        // Initial setup on window load
+        window.onload = function() {
+             if ('webkitSpeechRecognition' in window) {
+                recognition = new window.webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'ta-IN';
+                recognition.interimResults = false;
+                recognition.onstart = () => { isListening = true; renderPage(); };
+                recognition.onend = () => { isListening = false; renderPage(); };
+                recognition.onerror = (event) => {
+                    showModal(t.modalErrorTitle, t.speechRecognitionError + ' - ' + event.error);
+                    isListening = false;
+                    renderPage();
+                };
+            }
+
+            renderPage();
+        };
+
+    </script>
+
+</body>
+</html>
